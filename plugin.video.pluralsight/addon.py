@@ -13,6 +13,14 @@ from resources.lib import requests
 from resources.data.models import Catalog
 import json
 
+# region Constants
+MODE_SEARCH = 'search'
+MODE_CATEGORY = 'category'
+MODE_COURSES = 'courses'
+MODE_MODULES = 'modules'
+MODE_COURSE_BY_CATEGORY = 'courses_by_category'
+MODE_CLIPS = 'clips'
+# endregion
 
 # region Global Functions
 def debug_log(string):
@@ -52,7 +60,6 @@ def get_video_url(video_url, token):
     response = requests.post(video_url, data=payload, headers=video_headers)
     return response.json()
 # endregion
-
 
 # region Kodi setup
 
@@ -100,48 +107,56 @@ catalog = Catalog.Catalog(json.load(raw_catalog))
 
 mode = args.get('mode', None)
 
+
+def search_for(search_criteria):
+    search_url = "http://www.pluralsight.com/metadata/live/search?query={param}".format(urllib.urlencode(search_criteria))
+    search_headers = {"Accept-Language": "en-us", "Content-Type": "application/json", "Accept": "application/json",
+                     "Accept-Encoding": "gzip"}
+    response = requests.get(search_url, search_headers)
+    return response
+
 if mode is None:
     debug_log("No mode, defaulting to main menu")
-    url = build_url({'mode': 'courses', 'cached': 'true'})
+    url = build_url({'mode': MODE_COURSES, 'cached': 'true'})
     li = xbmcgui.ListItem('Courses', iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
-    url = build_url({'mode': 'category', 'cached': 'true'})
+    url = build_url({'mode': MODE_CATEGORY, 'cached': 'true'})
     li = xbmcgui.ListItem('Categories', iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
-    url = build_url({'mode': 'search', 'cached': 'true'})
+    url = build_url({'mode': MODE_SEARCH, 'cached': 'true'})
     li = xbmcgui.ListItem('Search', iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
-elif mode[0] == "courses":
+elif mode[0] == MODE_COURSES:
     for course in catalog.courses:
-        url = build_url({'mode': 'modules', 'course': course.name, 'cached': 'true'})
+        url = build_url({'mode': MODE_MODULES, 'course': course.name, 'cached': 'true'})
         li = xbmcgui.ListItem(course.title, iconImage='DefaultFolder.png')
         li.setInfo('video', {'plot': course.description, 'genre': course.category})
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
-elif mode[0] == "modules":
+elif mode[0] == MODE_MODULES:
     title = args.get('course', None)
     for module in catalog.get_course_by_name(title[0]).modules:
-        url = build_url({'mode': 'clips', 'course': title[0], 'module': module.title, 'cached': 'true'})
+        url = build_url({'mode': MODE_CLIPS, 'course': title[0], 'module': module.title, 'cached': 'true'})
         li = xbmcgui.ListItem(module.title, iconImage='DefaultFolder.png')
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
-elif mode[0] == "category":
+elif mode[0] == MODE_CATEGORY:
     for category in catalog.categories:
-        url = build_url({'mode': 'courses_by_category', 'category': category, 'cached': 'true'})
+        url = build_url({'mode': MODE_COURSE_BY_CATEGORY, 'category': category, 'cached': 'true'})
         li = xbmcgui.ListItem(category, iconImage='DefaultFolder.png')
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
-elif mode[0] == "courses_by_category":
+elif mode[0] == MODE_COURSE_BY_CATEGORY:
     input_category = args.get('category', None)
     for course in catalog.get_courses_by_category(input_category[0]):
-        url = build_url({'mode': 'modules', 'course': course.name, 'cached': 'true'})
+        url = build_url({'mode': MODE_MODULES, 'course': course.name, 'cached': 'true'})
         li = xbmcgui.ListItem(course.title, iconImage='DefaultFolder.png')
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
-elif mode[0] == "clips":
+elif mode[0] == MODE_CLIPS:
     auth = login()
     input_module = args.get('module', None)
     title = args.get('course', None)
@@ -153,5 +168,17 @@ elif mode[0] == "clips":
                 li = xbmcgui.ListItem(clip.title, iconImage='DefaultVideo.png')
                 li.addStreamInfo('video', {'width': 1024, 'height': 768, 'duration': clip.duration})
                 xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li)
+
+elif mode[0] == MODE_SEARCH:
+    dialog = xbmcgui.Dialog()
+    search_criteria = dialog.input("Search Criteria", type=xbmcgui.INPUT_ALPHANUM)
+    debug_log("Searching for: " + search_criteria)
+    results = search_for(search_criteria)
+    for course_name in results.Courses:
+        course = catalog.get_course_by_name(course_name)
+        url = build_url({'mode': 'modules', 'course': course, 'cached': 'true'})
+        li = xbmcgui.ListItem(course.title, iconImage='DefaultFolder.png')
+        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+
 
 xbmcplugin.endOfDirectory(addon_handle)

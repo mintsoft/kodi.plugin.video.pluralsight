@@ -1,5 +1,3 @@
-import json
-
 class Course:
     def __init__(self, name, title, description, modules, category):
         self.category = category
