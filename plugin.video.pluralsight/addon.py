@@ -90,14 +90,22 @@ elif mode[0] == "clips":
         if module.title == input_module[0]:
             for clip in module.clips:
                 url = build_url({'mode': 'play'})
-                li = xbmcgui.ListItem(clip.title, iconImage='DefaultFolder.png')
+                li = xbmcgui.ListItem(clip.title, iconImage='DefaultVideo.png')
                 xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
     xbmcplugin.endOfDirectory(addon_handle)
 
 elif mode[0] == "category":
-    for cat in catalog.categories:
-        url = build_url({'mode': 'newest', 'cached':'true'})
-        li = xbmcgui.ListItem(cat, iconImage='DefaultFolder.png')
+    for category in catalog.categories:
+        url = build_url({'mode': 'courses_by_category', 'category':category, 'cached':'true'})
+        li = xbmcgui.ListItem(category, iconImage='DefaultFolder.png')
+        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+    xbmcplugin.endOfDirectory(addon_handle)
+
+elif mode[0] == "courses_by_category":
+    input_category = args.get('category', None)
+    for course in catalog.get_course_by_category(input_category[0]):
+        url = build_url({'mode': 'modules', 'course': course.title.encode('UTF8'), 'cached': 'true'})
+        li = xbmcgui.ListItem(course.title, iconImage='DefaultFolder.png')
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
     xbmcplugin.endOfDirectory(addon_handle)
 

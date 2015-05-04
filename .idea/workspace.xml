@@ -8,92 +8,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f1acf36c-a014-4408-85ad-390d1b7cc41a" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/data/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/packages/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/packages/ssl_match_hostname/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/util/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/_collections.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/packages/ssl_match_hostname/_implementation.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/adapters.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/api.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/auth.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/big5freq.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/big5prober.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/cacert.pem" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/certs.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/chardetect.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/chardistribution.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/charsetgroupprober.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/charsetprober.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/codingstatemachine.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/compat.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/compat.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/connection.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/util/connection.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/connectionpool.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/constants.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/cookies.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/cp949prober.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/escprober.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/escsm.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/eucjpprober.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/euckrfreq.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/euckrprober.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/euctwfreq.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/euctwprober.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/exceptions.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/exceptions.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/fields.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/filepost.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/gb2312freq.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/gb2312prober.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/hebrewprober.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/hooks.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/jisfreq.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/jpcntx.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/langbulgarianmodel.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/langcyrillicmodel.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/langgreekmodel.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/langhebrewmodel.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/langhungarianmodel.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/langthaimodel.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/latin1prober.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/mbcharsetprober.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/mbcsgroupprober.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/mbcssm.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/models.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/contrib/ntlmpool.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/packages/ordered_dict.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/poolmanager.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/contrib/pyopenssl.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/request.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/util/request.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/response.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/util/response.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/util/retry.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/sbcharsetprober.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/sbcsgroupprober.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/sessions.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/packages/six.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/sjisprober.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/util/ssl_.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/status_codes.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/structures.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/util/timeout.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/universaldetector.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/util/url.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/chardet/utf8prober.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/utils.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Catalog.py" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Catalog.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugin.video.pluralsight/addon.py" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/addon.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MOVED" beforePath="G:\Kodi Pluralsight Plugin\kodi.plugin.video.pluralsight\plugin.video.pluralsight\resources\lib\.repo_hack" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/packages/urllib3/contrib/__init__.py" />
     </list>
     <ignored path="kodi.plugin.video.pluralsight.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -120,8 +35,8 @@
       <file leaf-file-name="addon.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/addon.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.54105735" vertical-offset="828" max-vertical-offset="1921">
-              <caret line="77" column="36" selection-start-line="77" selection-start-column="36" selection-end-line="77" selection-end-column="36" />
+            <state vertical-scroll-proportion="0.6175478" vertical-offset="1168" max-vertical-offset="2057">
+              <caret line="101" column="43" selection-start-line="101" selection-start-column="43" selection-end-line="101" selection-end-column="43" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -740,8 +655,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/addon.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.54105735" vertical-offset="828" max-vertical-offset="1921">
-          <caret line="77" column="36" selection-start-line="77" selection-start-column="36" selection-end-line="77" selection-end-column="36" />
+        <state vertical-scroll-proportion="0.6175478" vertical-offset="1168" max-vertical-offset="2057">
+          <caret line="101" column="43" selection-start-line="101" selection-start-column="43" selection-end-line="101" selection-end-column="43" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
