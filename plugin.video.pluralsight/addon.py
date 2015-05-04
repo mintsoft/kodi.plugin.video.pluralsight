@@ -13,39 +13,8 @@ from resources.lib import requests
 from resources.data.models import Catalog
 import json
 
-__settings__ = xbmcaddon.Addon()
-rootDir = __settings__.getAddonInfo('path')
-if rootDir[-1] == ';':
-    rootDir = rootDir[0:-1]
-rootDir = xbmc.translatePath(rootDir)
 
-LIB_DIR = xbmc.translatePath(os.path.join(rootDir, 'resources', 'lib'))
-sys.path.append(LIB_DIR)
-
-base_url = sys.argv[0]
-addon_handle = int(sys.argv[1])
-args = urlparse.parse_qs(sys.argv[2][1:])
-
-temp_path = xbmc.translatePath("special://temp/")
-catalog_path = os.path.join(temp_path, "catalog.txt")
-
-xbmcplugin.setContent(addon_handle, 'movies')
-
-debug = True
-
-cached = args.get('cached', None)
-if cached is None and debug is not True:
-    cache_headers = {"Accept-Language": "en-us", "Content-Type": "application/json", "Accept": "application/json",
-               "Accept-Encoding": "gzip"}
-    r = requests.get("http://www.pluralsight.com/metadata/live/courses/", headers=cache_headers)
-
-    with open(catalog_path, "w") as catalog_data:
-        catalog_data.write(json.dumps(r.json()))
-
-raw_catalog = open(catalog_path, "r")
-catalog = Catalog.Catalog(json.load(raw_catalog))
-
-
+# region Global Functions
 def debug_log(string):
     xbmc.log(string, xbmc.LOGNOTICE)
 
@@ -54,14 +23,21 @@ def build_url(query):
     return base_url + '?' + urllib.urlencode(query)
 
 
+def credentials_are_valid():
+    dialog = xbmcgui.Dialog()
+    if username == "" or password == "":
+        dialog.ok("Credentials Error", "Username or password are empty, please configure these in the settings")
+        return False
+    elif "@" in username:
+        dialog.ok("Login Error", "You appear be attempting to use an email address to login\n\nPluralsight requires the username instead, please change this in the settings")
+        return False
+    return True
+
+
 def login():
     debug_log("Starting login")
     login_headers = {"Content-Type": "application/x-www-form-urlencoded"}
-    password = xbmcplugin.getSetting(addon_handle, "password")
     payload = {"Password": password}
-    username = xbmcplugin.getSetting(addon_handle, "username")
-    if "@" in username:
-        
     login_url = "https://www.pluralsight.com/metadata/live/users/" + username + "/login"
     debug_log("Using url: " + login_url)
     response = requests.post(login_url, data=payload, headers=login_headers)
@@ -75,7 +51,52 @@ def get_video_url(video_url, token):
     payload = {"Token": token}
     response = requests.post(video_url, data=payload, headers=video_headers)
     return response.json()
+# endregion
 
+
+# region Kodi setup
+
+__settings__ = xbmcaddon.Addon()
+rootDir = __settings__.getAddonInfo('path')
+if rootDir[-1] == ';':
+    rootDir = rootDir[0:-1]
+rootDir = xbmc.translatePath(rootDir)
+
+LIB_DIR = xbmc.translatePath(os.path.join(rootDir, 'resources', 'lib'))
+sys.path.append(LIB_DIR)
+
+base_url = sys.argv[0]
+addon_handle = int(sys.argv[1])
+args = urlparse.parse_qs(sys.argv[2][1:])
+# endregion
+
+# region Globals
+temp_path = xbmc.translatePath("special://temp/")
+catalog_path = os.path.join(temp_path, "catalog.txt")
+
+xbmcplugin.setContent(addon_handle, 'movies')
+
+username = xbmcplugin.getSetting(addon_handle, "username")
+password = xbmcplugin.getSetting(addon_handle, "password")
+# endregion
+
+# Main entry point
+if not credentials_are_valid():
+    xbmcplugin.endOfDirectory(addon_handle)
+
+debug = True
+
+cached = args.get('cached', None)
+if cached is None and debug is not True:
+    cache_headers = {"Accept-Language": "en-us", "Content-Type": "application/json", "Accept": "application/json",
+                     "Accept-Encoding": "gzip"}
+    r = requests.get("http://www.pluralsight.com/metadata/live/courses/", headers=cache_headers)
+
+    with open(catalog_path, "w") as catalog_data:
+        catalog_data.write(json.dumps(r.json()))
+
+raw_catalog = open(catalog_path, "r")
+catalog = Catalog.Catalog(json.load(raw_catalog))
 
 mode = args.get('mode', None)
 
@@ -93,15 +114,12 @@ if mode is None:
     li = xbmcgui.ListItem('Search', iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
-    xbmcplugin.endOfDirectory(addon_handle)
-
 elif mode[0] == "courses":
     for course in catalog.courses:
         url = build_url({'mode': 'modules', 'course': course.name, 'cached': 'true'})
         li = xbmcgui.ListItem(course.title, iconImage='DefaultFolder.png')
         li.setInfo('video', {'plot': course.description, 'genre': course.category})
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
-    xbmcplugin.endOfDirectory(addon_handle)
 
 elif mode[0] == "modules":
     title = args.get('course', None)
@@ -109,14 +127,12 @@ elif mode[0] == "modules":
         url = build_url({'mode': 'clips', 'course': title[0], 'module': module.title, 'cached': 'true'})
         li = xbmcgui.ListItem(module.title, iconImage='DefaultFolder.png')
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
-    xbmcplugin.endOfDirectory(addon_handle)
 
 elif mode[0] == "category":
     for category in catalog.categories:
         url = build_url({'mode': 'courses_by_category', 'category': category, 'cached': 'true'})
         li = xbmcgui.ListItem(category, iconImage='DefaultFolder.png')
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
-    xbmcplugin.endOfDirectory(addon_handle)
 
 elif mode[0] == "courses_by_category":
     input_category = args.get('category', None)
@@ -124,7 +140,6 @@ elif mode[0] == "courses_by_category":
         url = build_url({'mode': 'modules', 'course': course.name, 'cached': 'true'})
         li = xbmcgui.ListItem(course.title, iconImage='DefaultFolder.png')
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
-    xbmcplugin.endOfDirectory(addon_handle)
 
 elif mode[0] == "clips":
     auth = login()
@@ -138,4 +153,5 @@ elif mode[0] == "clips":
                 li = xbmcgui.ListItem(clip.title, iconImage='DefaultVideo.png')
                 li.addStreamInfo('video', {'width': 1024, 'height': 768, 'duration': clip.duration})
                 xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li)
-    xbmcplugin.endOfDirectory(addon_handle)
+
+xbmcplugin.endOfDirectory(addon_handle)
