@@ -59,7 +59,8 @@ class Catalog:
                        course["Description"],
                        course_modules,
                        raw_categories[int(course["Category"])]))
-
+        self.authors = [Author(x["DisplayName"],x["Handle"]) for x in raw_authors]
+        self.categories = [x for x in raw_categories]
         self.courses = courses
 
     def get_courses_by_title(self,title):
