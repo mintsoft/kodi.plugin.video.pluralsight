@@ -1,7 +1,7 @@
 import json
+import urllib
 
 class Course:
-
     def __init__(self, name, title, description, modules, category):
         self.category = category
         self.description = description
@@ -9,31 +9,39 @@ class Course:
         self.name = name
         self.modules = modules
 
-class Module:
 
-    def __init__(self,name,tile, clips, author):
+class Module:
+    def __init__(self, name, tile, clips, author):
         self.author = author
         self.name = name
         self.title = tile
         self.clips = clips
 
-class Author:
 
-    def __init__(self,display_name, handle):
+class Author:
+    def __init__(self, display_name, handle):
         self.handle = handle
         self.display_name = display_name
 
 
 class Clip:
-
-    def __init__(self, title, duration):
+    def __init__(self, title, duration, index, course_name, author_handle, module_name):
+        self.module_name = module_name
+        self.author_handle = author_handle
+        self.course_name = course_name
+        self.index = index
         self.duration = duration
         self.title = title
 
+    def get_url(self, username):
+        return "http://www.pluralsight.com/metadata/live/users/{username}/" \
+               "viewclip/{courseName}/{authorHandle}/{moduleName}/{clipIndex}" \
+               "/1024x768mp4".format(username=username, courseName=self.course_name, authorHandle=self.author_handle,
+                                     moduleName=self.module_name, clipIndex=self.index)
+
 
 class Catalog:
-
-    def __init__(self,data):
+    def __init__(self, data):
         raw_courses = data["Courses"]
         raw_modules = data["Modules"]
         raw_authors = data["Authors"]
@@ -47,11 +55,14 @@ class Catalog:
 
             course_modules = []
             for module in raw_course_modules:
-                clips = [Clip(y["Title"],y["Duration"]) for y in module["Clips"]]
                 module_author = raw_authors[int(module["Author"])]
-                author = Author(module_author["DisplayName"],module_author["Handle"])
-                course_modules.append(Module(module["Name"],module["Title"],clips,author))
 
+                clips = []
+                for i, clip in enumerate(module["Clips"]):
+                    clips.append(Clip(clip["Title"], clip["Duration"], i, course["Name"], module_author["Handle"], module["Name"]))
+
+                author = Author(module_author["DisplayName"], module_author["Handle"])
+                course_modules.append(Module(module["Name"], module["Title"], clips, author))
 
             courses.append(
                 Course(course["Name"],
@@ -59,22 +70,21 @@ class Catalog:
                        course["Description"],
                        course_modules,
                        raw_categories[int(course["Category"])]))
-        self.authors = [Author(x["DisplayName"],x["Handle"]) for x in raw_authors]
+        self.authors = [Author(x["DisplayName"], x["Handle"]) for x in raw_authors]
         self.categories = [x for x in raw_categories]
         self.courses = courses
 
-    def get_courses_by_title(self,title):
-        return filter(lambda x: x.title == title,self.courses)
+    def get_courses_by_title(self, title):
+        return filter(lambda x: x.title == title, self.courses)
 
-    def get_course_by_author(self,author):
+    def get_course_by_author(self, author):
         return filter(lambda x: x.author.display_name == author, self.courses)
 
-    def get_course_by_category(self,category):
-       return filter(lambda x: x.category == category, self.courses)
-
+    def get_course_by_category(self, category):
+        return filter(lambda x: x.category == category, self.courses)
 
 
 if __name__ == "__main__":
     raw = open("G:\Kodi Pluralsight Plugin\pluralsight\courses2.txt")
     catalog = Catalog(json.load(raw))
-    for x in catalog.get_course_by_category(".NET") : print x.title
+    for x in catalog.get_course_by_category(".NET"): print x.title

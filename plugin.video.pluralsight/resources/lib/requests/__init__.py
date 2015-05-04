@@ -54,7 +54,8 @@ try:
     pyopenssl.inject_into_urllib3()
 except ImportError:
     pass
-
+from .packages import urllib3
+urllib3.disable_warnings()
 from . import utils
 from .models import Request, Response, PreparedRequest
 from .api import request, get, head, post, patch, put, delete, options
