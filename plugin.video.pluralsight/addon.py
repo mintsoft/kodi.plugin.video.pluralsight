@@ -20,6 +20,8 @@ MODE_COURSES = 'courses'
 MODE_MODULES = 'modules'
 MODE_COURSE_BY_CATEGORY = 'courses_by_category'
 MODE_CLIPS = 'clips'
+
+DEBUG = True
 # endregion
 
 # region Global Functions
@@ -49,8 +51,7 @@ def login():
     login_url = "https://www.pluralsight.com/metadata/live/users/" + username + "/login"
     debug_log("Using url: " + login_url)
     response = requests.post(login_url, data=payload, headers=login_headers)
-    debug_log("Completed login:")
-    debug_log("Response Code:" + str(response.status_code))
+    debug_log("Completed login, Response Code:" + str(response.status_code))
     return response.json()
 
 
@@ -91,10 +92,8 @@ password = xbmcplugin.getSetting(addon_handle, "password")
 if not credentials_are_valid():
     xbmcplugin.endOfDirectory(addon_handle)
 
-debug = True
-
 cached = args.get('cached', None)
-if cached is None and debug is not True:
+if cached is None and DEBUG is not True:
     cache_headers = {"Accept-Language": "en-us", "Content-Type": "application/json", "Accept": "application/json",
                      "Accept-Encoding": "gzip"}
     r = requests.get("http://www.pluralsight.com/metadata/live/courses/", headers=cache_headers)
@@ -109,11 +108,13 @@ mode = args.get('mode', None)
 
 
 def search_for(search_criteria):
-    search_url = "http://www.pluralsight.com/metadata/live/search?query={param}".format(urllib.urlencode(search_criteria))
+    search_safe = urllib.quote_plus(search_criteria)
+    search_url = "http://www.pluralsight.com/metadata/live/search?query=" + search_safe
     search_headers = {"Accept-Language": "en-us", "Content-Type": "application/json", "Accept": "application/json",
                      "Accept-Encoding": "gzip"}
-    response = requests.get(search_url, search_headers)
-    return response
+    debug_log("Hitting: " + search_url)
+    response = requests.get(search_url, headers=search_headers)
+    return response.json()
 
 if mode is None:
     debug_log("No mode, defaulting to main menu")
@@ -174,7 +175,7 @@ elif mode[0] == MODE_SEARCH:
     search_criteria = dialog.input("Search Criteria", type=xbmcgui.INPUT_ALPHANUM)
     debug_log("Searching for: " + search_criteria)
     results = search_for(search_criteria)
-    for course_name in results.Courses:
+    for course_name in results['Courses']:
         course = catalog.get_course_by_name(course_name)
         url = build_url({'mode': 'modules', 'course': course, 'cached': 'true'})
         li = xbmcgui.ListItem(course.title, iconImage='DefaultFolder.png')
