@@ -46,16 +46,22 @@ raw_catalog = open(catalog_path,"r")
 catalog = Catalog.Catalog(json.load(raw_catalog))
 
 
+def debug_log(string):
+    xbmc.log(string, xbmc.LOGNOTICE)
+
 def build_url(query):
     return base_url + '?' + urllib.urlencode(query)
 
 def login():
+    debug_log("Starting login")
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     password = xbmcplugin.getSetting(addon_handle,"password")
     payload = {"Password":password}
     username = xbmcplugin.getSetting(addon_handle,"username")
     url = "https://www.pluralsight.com/metadata/live/users/" + username + "/login"
+    debug_log("Using url: " + url)
     r = requests.post(url, data=payload,headers=headers)
+    debug_log("Completed login")
     return r.json()
 
 def get_video_url(url,token):
@@ -67,6 +73,7 @@ def get_video_url(url,token):
 mode = args.get('mode', None)
 
 if mode is None:
+    debug_log("No mode, defaulting to main menu")
     url = build_url({'mode': 'courses', 'cached':'true'})
     li = xbmcgui.ListItem('Courses', iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url,listitem=li, isFolder=True)
