@@ -64,7 +64,6 @@ def get_video_url(url,token):
     r = requests.post(url, data=payload,headers=headers)
     return r.json()
 
-
 mode = args.get('mode', None)
 
 if mode is None:
@@ -84,30 +83,18 @@ if mode is None:
 
 elif mode[0] == "courses":
     for course in catalog.courses:
-        url = build_url({'mode': 'modules', 'course': course.title.encode('UTF8'), 'cached': 'true'})
+        url = build_url({'mode': 'modules', 'course': course.name, 'cached': 'true'})
         li = xbmcgui.ListItem(course.title, iconImage='DefaultFolder.png')
+        li.setInfo('video', {'plot': course.description, 'genre': course.category})
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
     xbmcplugin.endOfDirectory(addon_handle)
 
 elif mode[0] == "modules":
     title = args.get('course', None)
-    for module in catalog.get_courses_by_title(title[0])[0].modules:
+    for module in catalog.get_course_by_name(title[0]).modules:
         url = build_url({'mode': 'clips','course':title[0], 'module': module.title, 'cached': 'true'})
         li = xbmcgui.ListItem(module.title, iconImage='DefaultFolder.png')
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
-    xbmcplugin.endOfDirectory(addon_handle)
-
-elif mode[0] == "clips":
-    auth = login()
-    input_module = args.get('module', None)
-    title = args.get('course', None)
-    for module in catalog.get_courses_by_title(title[0])[0].modules:
-        if module.title == input_module[0]:
-            for clip in module.clips:
-                clip_url = clip.get_url(xbmcplugin.getSetting(addon_handle,"username"))
-                url = get_video_url(clip_url, auth["Token"])["VideoUrl"]
-                li = xbmcgui.ListItem(clip.title, iconImage='DefaultVideo.png')
-                xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li)
     xbmcplugin.endOfDirectory(addon_handle)
 
 elif mode[0] == "category":
@@ -119,14 +106,22 @@ elif mode[0] == "category":
 
 elif mode[0] == "courses_by_category":
     input_category = args.get('category', None)
-    for course in catalog.get_course_by_category(input_category[0]):
-        url = build_url({'mode': 'modules', 'course': course.title.encode('UTF8'), 'cached': 'true'})
+    for course in catalog.get_courses_by_category(input_category[0]):
+        url = build_url({'mode': 'modules', 'course': course.name, 'cached': 'true'})
         li = xbmcgui.ListItem(course.title, iconImage='DefaultFolder.png')
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
     xbmcplugin.endOfDirectory(addon_handle)
 
-else:
-    url = build_url({'cache':'true'})
-    li = xbmcgui.ListItem(mode[0] + ' Video', iconImage='DefaultVideo.png')
-    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li)
+elif mode[0] == "clips":
+    auth = login()
+    input_module = args.get('module', None)
+    title = args.get('course', None)
+    for module in catalog.get_course_by_name(title[0]).modules:
+        if module.title == input_module[0]:
+            for clip in module.clips:
+                clip_url = clip.get_url(xbmcplugin.getSetting(addon_handle,"username"))
+                url = get_video_url(clip_url, auth["Token"])["VideoUrl"]
+                li = xbmcgui.ListItem(clip.title,  iconImage='DefaultVideo.png')
+                li.addStreamInfo('video', {'width': 1024, 'height': 768, 'duration': clip.duration})
+                xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li)
     xbmcplugin.endOfDirectory(addon_handle)

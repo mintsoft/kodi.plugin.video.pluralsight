@@ -1,5 +1,4 @@
 import json
-import urllib
 
 class Course:
     def __init__(self, name, title, description, modules, category):
@@ -11,7 +10,8 @@ class Course:
 
 
 class Module:
-    def __init__(self, name, tile, clips, author):
+    def __init__(self, name, tile, clips, author, duration):
+        self.duration = duration
         self.author = author
         self.name = name
         self.title = tile
@@ -62,29 +62,28 @@ class Catalog:
                     clips.append(Clip(clip["Title"], clip["Duration"], i, course["Name"], module_author["Handle"], module["Name"]))
 
                 author = Author(module_author["DisplayName"], module_author["Handle"])
-                course_modules.append(Module(module["Name"], module["Title"], clips, author))
+                course_modules.append(Module(module["Name"], module["Title"], clips, author, module["Duration"]))
 
             courses.append(
                 Course(course["Name"],
-                       course["Title"],
+                       course["Title"].encode('UTF8'),
                        course["Description"],
                        course_modules,
                        raw_categories[int(course["Category"])]))
-        self.authors = [Author(x["DisplayName"], x["Handle"]) for x in raw_authors]
+        self.authors = sorted([Author(x["DisplayName"], x["Handle"]) for x in raw_authors], key=lambda author : author.display_name)
         self.categories = [x for x in raw_categories]
-        self.courses = courses
+        self.courses = sorted(courses, key=lambda course: course.title)
 
-    def get_courses_by_title(self, title):
-        return filter(lambda x: x.title == title, self.courses)
+    def get_course_by_name(self, name):
+        return filter(lambda x: x.name == name, self.courses)[0]
 
-    def get_course_by_author(self, author):
+    def get_course_by_title(self, title):
+        return filter(lambda x: x.title == title, self.courses)[0]
+
+    def get_courses_by_author(self, author):
         return filter(lambda x: x.author.display_name == author, self.courses)
 
-    def get_course_by_category(self, category):
+    def get_courses_by_category(self, category):
         return filter(lambda x: x.category == category, self.courses)
 
 
-if __name__ == "__main__":
-    raw = open("G:\Kodi Pluralsight Plugin\pluralsight\courses2.txt")
-    catalog = Catalog(json.load(raw))
-    for x in catalog.get_course_by_category(".NET"): print x.title
