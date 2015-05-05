@@ -1,5 +1,6 @@
 import os
 import sys
+import cPickle
 
 import xbmc
 import xbmcaddon
@@ -21,7 +22,7 @@ MODE_MODULES = 'modules'
 MODE_COURSE_BY_CATEGORY = 'courses_by_category'
 MODE_CLIPS = 'clips'
 
-DEBUG = True
+DEBUG = False
 # endregion
 
 # region Global Functions
@@ -80,7 +81,8 @@ args = urlparse.parse_qs(sys.argv[2][1:])
 
 # region Globals
 temp_path = xbmc.translatePath("special://temp/")
-catalog_path = os.path.join(temp_path, "catalog.txt")
+catalog_path = os.path.join(temp_path, "catalog.pkl")
+etag_path = os.path.join(temp_path, "etag.pkl")
 
 xbmcplugin.setContent(addon_handle, 'movies')
 
@@ -93,16 +95,35 @@ if not credentials_are_valid():
     xbmcplugin.endOfDirectory(addon_handle)
 
 cached = args.get('cached', None)
+
 if cached is None and DEBUG is not True:
-    cache_headers = {"Accept-Language": "en-us", "Content-Type": "application/json", "Accept": "application/json",
-                     "Accept-Encoding": "gzip"}
+    etag = ""
+    if os.path.exists(etag_path):
+        with open(etag_path, "r") as raw_etag:
+            etag = cPickle.load(raw_etag)
+
+    cache_headers = {"Accept-Language": "en-us",
+                     "Content-Type": "application/json",
+                     "Accept": "application/json",
+                     "Accept-Encoding": "gzip",
+                     "If-None-Match": etag}
+
     r = requests.get("http://www.pluralsight.com/metadata/live/courses/", headers=cache_headers)
 
-    with open(catalog_path, "w") as catalog_data:
-        catalog_data.write(json.dumps(r.json()))
+    if r.status_code == 304:
+        debug_log("Loading from cache as it has not modified")
+        raw_catalog = open(catalog_path, "r")
+        catalog = cPickle.load(raw_catalog)
+    else:
+        catalog = Catalog.Catalog(r.json())
+        with open(catalog_path, "w") as catalog_data:
+            cPickle.dump(catalog, catalog_data)
 
-raw_catalog = open(catalog_path, "r")
-catalog = Catalog.Catalog(json.load(raw_catalog))
+        with open(etag_path, "w") as etag_file:
+            cPickle.dump(r.headers["ETag"], etag_file)
+else:
+    raw_catalog = open(catalog_path, "r")
+    catalog = cPickle.load(raw_catalog)
 
 mode = args.get('mode', None)
 
