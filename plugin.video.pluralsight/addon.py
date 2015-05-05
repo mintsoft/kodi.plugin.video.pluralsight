@@ -177,7 +177,7 @@ elif mode[0] == MODE_SEARCH:
     results = search_for(search_criteria)
     for course_name in results['Courses']:
         course = catalog.get_course_by_name(course_name)
-        url = build_url({'mode': 'modules', 'course': course, 'cached': 'true'})
+        url = build_url({'mode': MODE_MODULES, 'course': course_name, 'cached': 'true'})
         li = xbmcgui.ListItem(course.title, iconImage='DefaultFolder.png')
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
