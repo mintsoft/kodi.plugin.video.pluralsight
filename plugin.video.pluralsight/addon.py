@@ -134,8 +134,9 @@ if cached is None and DEBUG is not True:
         catalog = cPickle.load(raw_catalog)
         debug_log_duration("post-cache pickle")
     else:
-        debug_log_duration("pre-writing to cache")
+        debug_log_duration("pre-instantiating Catalog")
         catalog = Catalog.Catalog(r.json())
+        debug_log_duration("post-instantiating Catalog & pre-writing to cache")
         with open(catalog_path, "w") as catalog_data:
             cPickle.dump(catalog, catalog_data)
         debug_log_duration("post-writing to cache")
