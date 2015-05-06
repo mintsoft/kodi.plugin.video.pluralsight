@@ -1,18 +1,19 @@
 import os
 import sys
+import time
+
 import cPickle
+import urllib
+import urlparse
 
 import xbmc
 import xbmcaddon
 import xbmcplugin
 import xbmcgui
-
-import urllib
-import urlparse
-
 from resources.lib import requests
 from resources.data.models import Catalog
-import json
+
+start_time = time.time()
 
 # region Constants
 MODE_SEARCH = 'search'
@@ -25,9 +26,15 @@ MODE_CLIPS = 'clips'
 DEBUG = False
 # endregion
 
+
 # region Global Functions
 def debug_log(string):
     xbmc.log(string, xbmc.LOGNOTICE)
+
+
+def debug_log_duration(name):
+    duration = time.time() - start_time
+    xbmc.log("DURATION@" + name + " : " + str(duration))
 
 
 def build_url(query):
@@ -40,7 +47,8 @@ def credentials_are_valid():
         dialog.ok("Credentials Error", "Username or password are empty, please configure these in the settings")
         return False
     elif "@" in username:
-        dialog.ok("Login Error", "You appear be attempting to use an email address to login\n\nPluralsight requires the username instead, please change this in the settings")
+        dialog.ok("Login Error",
+                  "You appear be attempting to use an email address to login\n\nPluralsight requires the username instead, please change this in the settings")
         return False
     return True
 
@@ -61,10 +69,11 @@ def get_video_url(video_url, token):
     payload = {"Token": token}
     response = requests.post(video_url, data=payload, headers=video_headers)
     return response.json()
+
 # endregion
 
-# region Kodi setup
 
+# region Kodi setup
 __settings__ = xbmcaddon.Addon()
 rootDir = __settings__.getAddonInfo('path')
 if rootDir[-1] == ';':
@@ -79,6 +88,8 @@ addon_handle = int(sys.argv[1])
 args = urlparse.parse_qs(sys.argv[2][1:])
 # endregion
 
+
+debug_log_duration("PostKodiSetup")
 # region Globals
 temp_path = xbmc.translatePath("special://temp/")
 catalog_path = os.path.join(temp_path, "catalog.pkl")
@@ -90,41 +101,51 @@ username = xbmcplugin.getSetting(addon_handle, "username")
 password = xbmcplugin.getSetting(addon_handle, "password")
 # endregion
 
+debug_log_duration("PreMain")
 # Main entry point
 if not credentials_are_valid():
     xbmcplugin.endOfDirectory(addon_handle)
 
 cached = args.get('cached', None)
-
+debug_log_duration("pre-cache")
 if cached is None and DEBUG is not True:
-    etag = ""
+    e_tag = ""
+
     if os.path.exists(etag_path):
+        debug_log_duration("pre-etag-pickleload")
         with open(etag_path, "r") as raw_etag:
-            etag = cPickle.load(raw_etag)
+            e_tag = cPickle.load(raw_etag)
+        debug_log_duration("post-etag-pickleload")
 
     cache_headers = {"Accept-Language": "en-us",
                      "Content-Type": "application/json",
                      "Accept": "application/json",
                      "Accept-Encoding": "gzip",
-                     "If-None-Match": etag}
+                     "If-None-Match": e_tag}
 
+    debug_log_duration("pre-get")
     r = requests.get("http://www.pluralsight.com/metadata/live/courses/", headers=cache_headers)
+    debug_log_duration("post-get")
 
     if r.status_code == 304:
         debug_log("Loading from cache as it has not modified")
+        debug_log_duration("pre-cache pickle")
         raw_catalog = open(catalog_path, "r")
         catalog = cPickle.load(raw_catalog)
+        debug_log_duration("post-cache pickle")
     else:
+        debug_log_duration("pre-writing to cache")
         catalog = Catalog.Catalog(r.json())
         with open(catalog_path, "w") as catalog_data:
             cPickle.dump(catalog, catalog_data)
-
+        debug_log_duration("post-writing to cache")
         with open(etag_path, "w") as etag_file:
             cPickle.dump(r.headers["ETag"], etag_file)
+        debug_log_duration("post-writing etag")
 else:
     raw_catalog = open(catalog_path, "r")
     catalog = cPickle.load(raw_catalog)
-
+debug_log_duration("catalog-loaded")
 mode = args.get('mode', None)
 
 
@@ -132,11 +153,13 @@ def search_for(search_criteria):
     search_safe = urllib.quote_plus(search_criteria)
     search_url = "http://www.pluralsight.com/metadata/live/search?query=" + search_safe
     search_headers = {"Accept-Language": "en-us", "Content-Type": "application/json", "Accept": "application/json",
-                     "Accept-Encoding": "gzip"}
+                      "Accept-Encoding": "gzip"}
     debug_log("Hitting: " + search_url)
     response = requests.get(search_url, headers=search_headers)
     return response.json()
 
+
+debug_log_duration("Pre-mode switch")
 if mode is None:
     debug_log("No mode, defaulting to main menu")
     url = build_url({'mode': MODE_COURSES, 'cached': 'true'})
@@ -150,6 +173,7 @@ if mode is None:
     url = build_url({'mode': MODE_SEARCH, 'cached': 'true'})
     li = xbmcgui.ListItem('Search', iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+    debug_log_duration("finished default mode")
 
 elif mode[0] == MODE_COURSES:
     for course in catalog.courses:
@@ -157,6 +181,7 @@ elif mode[0] == MODE_COURSES:
         li = xbmcgui.ListItem(course.title, iconImage='DefaultFolder.png')
         li.setInfo('video', {'plot': course.description, 'genre': course.category})
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+    debug_log_duration("finished courses output")
 
 elif mode[0] == MODE_MODULES:
     title = args.get('course', None)
@@ -164,6 +189,7 @@ elif mode[0] == MODE_MODULES:
         url = build_url({'mode': MODE_CLIPS, 'course': title[0], 'module': module.title, 'cached': 'true'})
         li = xbmcgui.ListItem(module.title, iconImage='DefaultFolder.png')
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+    debug_log_duration("finished modules output")
 
 elif mode[0] == MODE_CATEGORY:
     for category in catalog.categories:
@@ -190,17 +216,18 @@ elif mode[0] == MODE_CLIPS:
                 li = xbmcgui.ListItem(clip.title, iconImage='DefaultVideo.png')
                 li.addStreamInfo('video', {'width': 1024, 'height': 768, 'duration': clip.duration})
                 xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li)
+    debug_log_duration("finished clips output")
 
 elif mode[0] == MODE_SEARCH:
     dialog = xbmcgui.Dialog()
     search_criteria = dialog.input("Search Criteria", type=xbmcgui.INPUT_ALPHANUM)
-    debug_log("Searching for: " + search_criteria)
+    debug_log_duration("pre-searching for: " + search_criteria)
     results = search_for(search_criteria)
     for course_name in results['Courses']:
         course = catalog.get_course_by_name(course_name)
         url = build_url({'mode': MODE_MODULES, 'course': course_name, 'cached': 'true'})
         li = xbmcgui.ListItem(course.title, iconImage='DefaultFolder.png')
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
-
+    debug_log_duration("finished search output")
 
 xbmcplugin.endOfDirectory(addon_handle)
