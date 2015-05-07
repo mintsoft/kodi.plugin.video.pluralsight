@@ -109,12 +109,13 @@ debug_log_duration("pre-cache")
 if cached is None and DEBUG is not True:
     catalog = Catalog.Catalog(database_path)
 
-    etag = catalog.get_etag()
-    cache_headers = {"Accept-Language": "en-us",
-                     "Content-Type": "application/json",
-                     "Accept": "application/json",
-                     "Accept-Encoding": "gzip",
-                     "If-None-Match": etag}
+    cache_headers = {
+        "Accept-Language": "en-us",
+         "Content-Type": "application/json",
+         "Accept": "application/json",
+         "Accept-Encoding": "gzip",
+         "If-None-Match": catalog.etag
+    }
 
     debug_log_duration("pre-get")
     r = requests.get("http://www.pluralsight.com/metadata/live/courses/", headers=cache_headers)
@@ -136,8 +137,12 @@ mode = args.get('mode', None)
 def search_for(search_criteria):
     search_safe = urllib.quote_plus(search_criteria)
     search_url = "http://www.pluralsight.com/metadata/live/search?query=" + search_safe
-    search_headers = {"Accept-Language": "en-us", "Content-Type": "application/json", "Accept": "application/json",
-                      "Accept-Encoding": "gzip"}
+    search_headers = {
+        "Accept-Language": "en-us",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Accept-Encoding": "gzip"
+    }
     debug_log("Hitting: " + search_url)
     response = requests.get(search_url, headers=search_headers)
     return response.json()
@@ -160,10 +165,10 @@ if mode is None:
     debug_log_duration("finished default mode")
 
 elif mode[0] == MODE_COURSES:
-    for course in catalog.get_courses():
-        url = build_url({'mode': MODE_MODULES, 'course': course[0].encode('UTF8'), 'cached': 'true'})
-        li = xbmcgui.ListItem(course[0], iconImage='DefaultFolder.png')
-        li.setInfo('video', {'plot': course[1], 'genre': course[2]})
+    for course in catalog.courses:
+        url = build_url({'mode': MODE_MODULES, 'course': course[1].encode('UTF8'), 'cached': 'true'})
+        li = xbmcgui.ListItem(course[1], iconImage='DefaultFolder.png')
+        li.setInfo('video', {'plot': course[2], 'genre': course[3]})
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
     debug_log_duration("finished courses output")
 
@@ -204,9 +209,9 @@ elif mode[0] == MODE_CLIPS:
 
 elif mode[0] == MODE_SEARCH:
     dialog = xbmcgui.Dialog()
-    search_criteria = dialog.input("Search Criteria", type=xbmcgui.INPUT_ALPHANUM)
-    debug_log_duration("pre-searching for: " + search_criteria)
-    results = search_for(search_criteria)
+    criteria = dialog.input("Search Criteria", type=xbmcgui.INPUT_ALPHANUM)
+    debug_log_duration("pre-searching for: " + criteria)
+    results = search_for(criteria)
     for course_name in results['Courses']:
         course = catalog.get_course_by_name(course_name)
         url = build_url({'mode': MODE_MODULES, 'course': course_name, 'cached': 'true'})

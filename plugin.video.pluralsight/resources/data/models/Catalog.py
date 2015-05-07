@@ -129,21 +129,22 @@ class Catalog:
 
         self.database.commit()
 
-    def get_etag(self):
+    @property
+    def etag(self):
         etag_from_db = self.database.cursor().execute('SELECT etag FROM cache_status').fetchone()
-        etag = ""
         if etag_from_db is not None:
-            etag = etag_from_db[0]
-        return etag
+            return etag_from_db[0]
+        return ""
 
-    def get_courses(self):
+    @property
+    def courses(self):
         return self.database.cursor().execute('SELECT * FROM course').fetchall()
 
     def get_course_by_name(self, name):
-        return self.database.cursor().execute('SELECT * FROM course WHERE name=?', name).fetchone()
+        return self.database.cursor().execute('SELECT * FROM course WHERE name=?', (name,)).fetchone()
 
     def get_course_by_title(self, title):
-        return self.database.cursor().execute('SELECT * FROM course WHERE title=?', title).fetchone()
+        return self.database.cursor().execute('SELECT * FROM course WHERE title=?', (title,)).fetchone()
 
     def get_courses_by_category(self, category):
         return self.database.cursor().execute('SELECT * FROM course WHERE category_id=?', int(category)).fetchall()
