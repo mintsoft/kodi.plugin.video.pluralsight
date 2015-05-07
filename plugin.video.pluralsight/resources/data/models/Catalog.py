@@ -1,6 +1,7 @@
 import sqlite3
 import os
 
+
 class Course:
     def __init__(self, name, title, description, modules, category):
         self.category = category
@@ -46,7 +47,14 @@ class Catalog:
         if not os.path.exists(database_path):
             database = sqlite3.connect(database_path)
             cursor = database.cursor()
-            cursor.execute('''CREATE TABLE course (name text, description text, category text) ''')
+
+            cursor.execute('''CREATE TABLE author   (id INTEGER PRIMARY KEY ASC, handle TEXT, displayname TEXT) ''')
+
+            cursor.execute('''CREATE TABLE course   (id INTEGER PRIMARY KEY ASC, name TEXT, description TEXT, category_id INTEGER) ''')
+            cursor.execute('''CREATE TABLE category (id INTEGER PRIMARY KEY ASC, name TEXT) ''')
+            cursor.execute('''CREATE TABLE module   (id INTEGER PRIMARY KEY ASC, author INT, name TEXT, title TEXT, duration INT) ''')
+            cursor.execute('''CREATE TABLE clip     (id INTEGER PRIMARY KEY ASC, module_id INT, title TEXT, duration TEXT) ''')
+
             database.commit()
         else:
             database = sqlite3.connect(database_path)
@@ -58,35 +66,46 @@ class Catalog:
             raw_categories = data["Categories"]
             cursor = database.cursor()
 
-            courses = []
+            cursor.execute('TRUNCATE TABLE category')
+            cursor.execute('TRUNCATE TABLE course')
+            cursor.execute('TRUNCATE TABLE clip')
+            cursor.execute('TRUNCATE TABLE module')
+            cursor.execute('TRUNCATE TABLE author')
+
+            for author in raw_authors:
+                cursor.execute('INSERT INTO author(handle, displayname) VALUES(?,?)',
+                               author["Handle"], author["DisplayName"])
+
+            for category in raw_categories:
+                cursor.execute('INSERT INTO category(name) VALUES(?)', category)
+
+            for module in raw_modules:
+                cursor.execute('INSERT INTO module(author, name, title, duration) VALUES(?,?,?,?)',
+                               int(module["Author"]), module["Name"], module["Title"], module["Duration"])
+                module_id = cursor.lastrowid
+                for clip in module["Clips"]:
+                    cursor.execute('INSERT INTO clip (module_id, title, duration) VALUES(?,?,?)',
+                                   module_id, clip["Title"], clip["Duration"])
+
             for course in raw_courses:
+                cursor.execute('INSERT INTO course(name, description, category_id) VALUES (?,?,?)',
+                               course["Title"], course["Description"], int(course["Category"]))
 
-                courses.append((
-                    course["Title"],
-                    course["Description"],
-                    raw_categories[int(course["Category"])]))
-
-            cursor.executemany('INSERT INTO course VALUES (?,?,?)', courses)
             database.commit()
 
         self.database = database
 
     def get_courses(self):
-        cursor = self.database.cursor()
-        return cursor.execute('SELECT * FROM course').fetchall()
+        return self.database.cursor().execute('SELECT * FROM course').fetchall()
 
     def get_course_by_name(self, name):
-        return filter(lambda x: x.name == name, self.courses)[0]
+        return self.database.cursor().execute('SELECT * FROM course WHERE name=?',name).fetchall()[0]
 
     def get_course_by_title(self, title):
-        return filter(lambda x: x.title == title, self.courses)[0]
-
-    def get_courses_by_author(self, author):
-        return filter(lambda x: x.author.display_name == author, self.courses)
+        return self.database.cursor().execute('SELECT * FROM course WHERE title=?', title).fetchall()[0]
 
     def get_courses_by_category(self, category):
-        return filter(lambda x: x.category == category, self.courses)
+        return self.database.cursor().execute('SELECT * FROM course WHERE category_id=?', int(category)).fetchall()
 
     def close_db(self):
         self.database.close()
-
