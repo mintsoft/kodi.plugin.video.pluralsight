@@ -66,11 +66,11 @@ class Catalog:
             raw_categories = data["Categories"]
             cursor = database.cursor()
 
-            cursor.execute('TRUNCATE TABLE category')
-            cursor.execute('TRUNCATE TABLE course')
-            cursor.execute('TRUNCATE TABLE clip')
-            cursor.execute('TRUNCATE TABLE module')
-            cursor.execute('TRUNCATE TABLE author')
+            cursor.execute('DELETE FROM category')
+            cursor.execute('DELETE FROM course')
+            cursor.execute('DELETE FROM clip')
+            cursor.execute('DELETE FROM module')
+            cursor.execute('DELETE FROM author')
 
             for author in raw_authors:
                 cursor.execute('INSERT INTO author(handle, displayname) VALUES(?,?)',
