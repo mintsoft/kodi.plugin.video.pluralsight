@@ -43,69 +43,100 @@ class Clip:
 
 
 class Catalog:
-    def __init__(self, database_path, data=None):
+    def __init__(self, database_path):
         if not os.path.exists(database_path):
             database = sqlite3.connect(database_path)
-            cursor = database.cursor()
 
-            cursor.execute('''CREATE TABLE author   (id INTEGER PRIMARY KEY ASC, handle TEXT, displayname TEXT) ''')
-
-            cursor.execute(
-                '''CREATE TABLE course   (id INTEGER PRIMARY KEY ASC, name TEXT, description TEXT, category_id INTEGER) ''')
-            cursor.execute('''CREATE TABLE category (id INTEGER PRIMARY KEY ASC, name TEXT) ''')
-            cursor.execute(
-                '''CREATE TABLE module   (id INTEGER PRIMARY KEY ASC, author INT, name TEXT, title TEXT, duration INT) ''')
-            cursor.execute(
-                '''CREATE TABLE clip     (id INTEGER PRIMARY KEY ASC, module_id INT, title TEXT, duration TEXT) ''')
+            database.execute('''
+                CREATE TABLE cache_status (
+                    etag TEXT
+                ) ''')
+            database.execute('''
+                CREATE TABLE author (
+                    id INTEGER PRIMARY KEY ASC,
+                    handle TEXT,
+                    displayname TEXT
+                ) ''')
+            database.execute('''
+                CREATE TABLE course (
+                    id INTEGER PRIMARY KEY ASC,
+                    name TEXT,
+                    description TEXT,
+                    category_id INTEGER
+                ) ''')
+            database.execute('''
+                CREATE TABLE category (
+                    id INTEGER PRIMARY KEY ASC,
+                    name TEXT
+                ) ''')
+            database.execute('''
+                CREATE TABLE module (
+                    id INTEGER PRIMARY KEY ASC,
+                    author INT,
+                    name TEXT,
+                    title TEXT,
+                    duration INT
+                ) ''')
+            database.execute('''
+                CREATE TABLE clip (
+                    id INTEGER PRIMARY KEY ASC,
+                    module_id INT,
+                    title TEXT,
+                    duration TEXT
+                ) ''')
 
             database.commit()
         else:
             database = sqlite3.connect(database_path)
 
-        if data is not None:
-            raw_courses = data["Courses"]
-            raw_modules = data["Modules"]
-            raw_authors = data["Authors"]
-            raw_categories = data["Categories"]
-            # cursor = database.cursor()
-
-            database.execute('DELETE FROM category')
-            database.execute('DELETE FROM course')
-            database.execute('DELETE FROM clip')
-            database.execute('DELETE FROM module')
-            database.execute('DELETE FROM author')
-
-            for author in raw_authors:
-                database.execute('INSERT INTO author(handle, displayname) VALUES(?,?)',
-                                 (author["Handle"], author["DisplayName"]))
-
-            for category in raw_categories:
-                database.execute('INSERT INTO category(name) VALUES(?)', category)
-
-            for module in raw_modules:
-                result = database.execute('INSERT INTO module(author, name, title, duration) VALUES(?,?,?,?)',
-                                          (int(module["Author"]), module["Name"], module["Title"], module["Duration"]))
-                module_id = result.lastrowid
-                for clip in module["Clips"]:
-                    database.execute('INSERT INTO clip (module_id, title, duration) VALUES(?,?,?)',
-                                     (module_id, clip["Title"], clip["Duration"]))
-
-            for course in raw_courses:
-                database.execute('INSERT INTO course(name, description, category_id) VALUES (?,?,?)',
-                                 course["Title"], course["Description"], int(course["Category"]))
-
-            database.commit()
-
         self.database = database
+
+    def update(self, etag, data):
+
+        raw_courses = data["Courses"]
+        raw_modules = data["Modules"]
+        raw_authors = data["Authors"]
+        raw_categories = data["Categories"]
+        # cursor = database.cursor()
+
+        self.database.execute('DELETE FROM category')
+        self.database.execute('DELETE FROM course')
+        self.database.execute('DELETE FROM clip')
+        self.database.execute('DELETE FROM module')
+        self.database.execute('DELETE FROM author')
+
+        for author in raw_authors:
+            self.database.execute('INSERT INTO author(handle, displayname) VALUES(?,?)',
+                                  (author["Handle"], author["DisplayName"]))
+
+        for category in raw_categories:
+            self.database.execute('INSERT INTO category(name) VALUES(?)', category)
+
+        for module in raw_modules:
+            result = self.database.execute('INSERT INTO module(author, name, title, duration) VALUES(?,?,?,?)',
+                                           (int(module["Author"]), module["Name"], module["Title"], module["Duration"]))
+            module_id = result.lastrowid
+            for clip in module["Clips"]:
+                self.database.execute('INSERT INTO clip (module_id, title, duration) VALUES(?,?,?)',
+                                      (module_id, clip["Title"], clip["Duration"]))
+
+        for course in raw_courses:
+            self.database.execute('INSERT INTO course(name, description, category_id) VALUES (?,?,?)',
+                                  course["Title"], course["Description"], int(course["Category"]))
+
+        self.database.commit()
+
+    def get_etag(self):
+        return self.database.cursor().execute('SELECT tag FROM cache_status').fetchone()
 
     def get_courses(self):
         return self.database.cursor().execute('SELECT * FROM course').fetchall()
 
     def get_course_by_name(self, name):
-        return self.database.cursor().execute('SELECT * FROM course WHERE name=?', name).fetchall()[0]
+        return self.database.cursor().execute('SELECT * FROM course WHERE name=?', name).fetchone()
 
     def get_course_by_title(self, title):
-        return self.database.cursor().execute('SELECT * FROM course WHERE title=?', title).fetchall()[0]
+        return self.database.cursor().execute('SELECT * FROM course WHERE title=?', title).fetchone()
 
     def get_courses_by_category(self, category):
         return self.database.cursor().execute('SELECT * FROM course WHERE category_id=?', int(category)).fetchall()

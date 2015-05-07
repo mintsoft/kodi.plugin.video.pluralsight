@@ -114,17 +114,13 @@ debug_log_duration("pre-cache")
 if cached is None and DEBUG is not True:
     e_tag = ""
 
-    if os.path.exists(etag_path):
-        debug_log_duration("pre-etag-pickleload")
-        with open(etag_path, "r") as raw_etag:
-            e_tag = cPickle.load(raw_etag)
-        debug_log_duration("post-etag-pickleload")
+    catalog = Catalog.Catalog(database_path)
 
     cache_headers = {"Accept-Language": "en-us",
                      "Content-Type": "application/json",
                      "Accept": "application/json",
                      "Accept-Encoding": "gzip",
-                     "If-None-Match": e_tag}
+                     "If-None-Match": catalog.get_etag()}
 
     debug_log_duration("pre-get")
     r = requests.get("http://www.pluralsight.com/metadata/live/courses/", headers=cache_headers)
@@ -132,13 +128,10 @@ if cached is None and DEBUG is not True:
 
     if r.status_code == 304:
         debug_log("Loading from cache as it has not modified")
-        catalog = Catalog.Catalog(database_path)
     else:
         debug_log_duration("Re-priming from the response")
-        catalog = Catalog.Catalog(database_path, r.json())
+        catalog.update(r.headers["ETag"], r.json())
 
-        with open(etag_path, "w") as etag_file:
-            cPickle.dump(r.headers["ETag"], etag_file)
 else:
     catalog = Catalog.Catalog(database_path)
 
