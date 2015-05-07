@@ -123,7 +123,7 @@ class Catalog:
 
         for course in raw_courses:
             self.database.execute('INSERT INTO course(name, description, category_id) VALUES (?,?,?)',
-                                  course["Title"], course["Description"], int(course["Category"]))
+                                  (course["Title"], course["Description"], int(course["Category"])))
 
         self.database.execute('INSERT INTO cache_status (etag) VALUES(?)', etag)
 
