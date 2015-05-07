@@ -1,4 +1,5 @@
 import sqlite3
+import os
 
 class Course:
     def __init__(self, name, title, description, modules, category):
@@ -41,7 +42,15 @@ class Clip:
 
 
 class Catalog:
-    def __init__(self, database, data= None):
+    def __init__(self, database_path, data=None):
+        if not os.path.exists(database_path):
+            database = sqlite3.connect(database_path)
+            cursor = database.cursor()
+            cursor.execute('''CREATE TABLE course (name text, description text, category text) ''')
+            database.commit()
+        else:
+            database = sqlite3.connect(database_path)
+
         if data is not None:
             raw_courses = data["Courses"]
             raw_modules = data["Modules"]
@@ -78,4 +87,6 @@ class Catalog:
     def get_courses_by_category(self, category):
         return filter(lambda x: x.category == category, self.courses)
 
+    def close_db(self):
+        self.database.close()
 

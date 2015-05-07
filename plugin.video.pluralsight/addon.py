@@ -111,16 +111,6 @@ if not credentials_are_valid():
 
 database_path = os.path.join(temp_path, 'example.db')
 
-
-if not os.path.exists(database_path):
-    database = sqlite3.connect(database_path)
-    cursor = database.cursor()
-    cursor.execute('''CREATE TABLE course (name text, description text, category text) ''')
-    database.commit()
-else:
-    database = sqlite3.connect(database_path)
-
-
 cached = args.get('cached', None)
 debug_log_duration("pre-cache")
 if cached is None and DEBUG is not True:
@@ -144,19 +134,15 @@ if cached is None and DEBUG is not True:
 
     if r.status_code == 304:
         debug_log("Loading from cache as it has not modified")
-        debug_log_duration("pre-cache pickle")
-        catalog = Catalog.Catalog(database)
-        debug_log_duration("post-cache pickle")
+        catalog = Catalog.Catalog(database_path)
     else:
-        debug_log_duration("pre-instantiating Catalog")
-        catalog = Catalog.Catalog(database,r.json())
-        debug_log_duration("post-instantiating Catalog & pre-writing to cache")
+        debug_log_duration("Re-prining from the response")
+        catalog = Catalog.Catalog(database_path, r.json())
 
         with open(etag_path, "w") as etag_file:
             cPickle.dump(r.headers["ETag"], etag_file)
-        debug_log_duration("post-writing etag")
 else:
-    catalog = Catalog.Catalog(database)
+    catalog = Catalog.Catalog(database_path)
 
 debug_log_duration("catalog-loaded")
 mode = args.get('mode', None)
@@ -244,6 +230,6 @@ elif mode[0] == MODE_SEARCH:
     debug_log_duration("finished search output")
 
 
-database.close()
+catalog.close_db()
 
 xbmcplugin.endOfDirectory(addon_handle)
