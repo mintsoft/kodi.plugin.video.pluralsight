@@ -95,8 +95,8 @@ args = urlparse.parse_qs(sys.argv[2][1:])
 debug_log_duration("PostKodiSetup")
 # region Globals
 temp_path = xbmc.translatePath("special://temp/")
-catalog_path = os.path.join(temp_path, "catalog.pkl")
-etag_path = os.path.join(temp_path, "etag.pkl")
+etag_path = os.path.join(temp_path, "pluralsight_etag.pkl")
+database_path = os.path.join(temp_path, 'pluralsight_catalog.db')
 
 xbmcplugin.setContent(addon_handle, 'movies')
 
@@ -108,8 +108,6 @@ debug_log_duration("PreMain")
 # Main entry point
 if not credentials_are_valid():
     xbmcplugin.endOfDirectory(addon_handle)
-
-database_path = os.path.join(temp_path, 'example.db')
 
 cached = args.get('cached', None)
 debug_log_duration("pre-cache")
