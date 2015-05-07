@@ -74,18 +74,18 @@ class Catalog:
 
             for author in raw_authors:
                 cursor.execute('INSERT INTO author(handle, displayname) VALUES(?,?)',
-                               author["Handle"], author["DisplayName"])
+                               (author["Handle"], author["DisplayName"]))
 
             for category in raw_categories:
                 cursor.execute('INSERT INTO category(name) VALUES(?)', category)
 
             for module in raw_modules:
                 cursor.execute('INSERT INTO module(author, name, title, duration) VALUES(?,?,?,?)',
-                               int(module["Author"]), module["Name"], module["Title"], module["Duration"])
+                               (int(module["Author"]), module["Name"], module["Title"], module["Duration"]))
                 module_id = cursor.lastrowid
                 for clip in module["Clips"]:
                     cursor.execute('INSERT INTO clip (module_id, title, duration) VALUES(?,?,?)',
-                                   module_id, clip["Title"], clip["Duration"])
+                                   (module_id, clip["Title"], clip["Duration"]))
 
             for course in raw_courses:
                 cursor.execute('INSERT INTO course(name, description, category_id) VALUES (?,?,?)',

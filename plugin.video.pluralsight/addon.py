@@ -134,7 +134,7 @@ if cached is None and DEBUG is not True:
         debug_log("Loading from cache as it has not modified")
         catalog = Catalog.Catalog(database_path)
     else:
-        debug_log_duration("Re-prining from the response")
+        debug_log_duration("Re-priming from the response")
         catalog = Catalog.Catalog(database_path, r.json())
 
         with open(etag_path, "w") as etag_file:
