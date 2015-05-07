@@ -13,6 +13,9 @@ import xbmcgui
 from resources.lib import requests
 from resources.data.models import Catalog
 
+import sqlite3
+
+
 start_time = time.time()
 
 # region Constants
@@ -106,6 +109,18 @@ debug_log_duration("PreMain")
 if not credentials_are_valid():
     xbmcplugin.endOfDirectory(addon_handle)
 
+database_path = os.path.join(temp_path, 'example.db')
+
+
+if not os.path.exists(database_path):
+    database = sqlite3.connect(database_path)
+    cursor = database.cursor()
+    cursor.execute('''CREATE TABLE course (name text, description text, category text) ''')
+    database.commit()
+else:
+    database = sqlite3.connect(database_path)
+
+
 cached = args.get('cached', None)
 debug_log_duration("pre-cache")
 if cached is None and DEBUG is not True:
@@ -130,22 +145,19 @@ if cached is None and DEBUG is not True:
     if r.status_code == 304:
         debug_log("Loading from cache as it has not modified")
         debug_log_duration("pre-cache pickle")
-        raw_catalog = open(catalog_path, "r")
-        catalog = cPickle.load(raw_catalog)
+        catalog = Catalog.Catalog(database)
         debug_log_duration("post-cache pickle")
     else:
         debug_log_duration("pre-instantiating Catalog")
-        catalog = Catalog.Catalog(r.json())
+        catalog = Catalog.Catalog(database,r.json())
         debug_log_duration("post-instantiating Catalog & pre-writing to cache")
-        with open(catalog_path, "w") as catalog_data:
-            cPickle.dump(catalog, catalog_data)
-        debug_log_duration("post-writing to cache")
+
         with open(etag_path, "w") as etag_file:
             cPickle.dump(r.headers["ETag"], etag_file)
         debug_log_duration("post-writing etag")
 else:
-    raw_catalog = open(catalog_path, "r")
-    catalog = cPickle.load(raw_catalog)
+    catalog = Catalog.Catalog(database)
+
 debug_log_duration("catalog-loaded")
 mode = args.get('mode', None)
 
@@ -177,10 +189,10 @@ if mode is None:
     debug_log_duration("finished default mode")
 
 elif mode[0] == MODE_COURSES:
-    for course in catalog.courses:
-        url = build_url({'mode': MODE_MODULES, 'course': course.name, 'cached': 'true'})
-        li = xbmcgui.ListItem(course.title, iconImage='DefaultFolder.png')
-        li.setInfo('video', {'plot': course.description, 'genre': course.category})
+    for course in catalog.get_courses():
+        url = build_url({'mode': MODE_MODULES, 'course': course[0].encode('UTF8'), 'cached': 'true'})
+        li = xbmcgui.ListItem(course[0], iconImage='DefaultFolder.png')
+        li.setInfo('video', {'plot': course[1], 'genre': course[2]})
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
     debug_log_duration("finished courses output")
 
@@ -230,5 +242,8 @@ elif mode[0] == MODE_SEARCH:
         li = xbmcgui.ListItem(course.title, iconImage='DefaultFolder.png')
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
     debug_log_duration("finished search output")
+
+
+database.close()
 
 xbmcplugin.endOfDirectory(addon_handle)

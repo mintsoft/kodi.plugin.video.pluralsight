@@ -1,3 +1,5 @@
+import sqlite3
+
 class Course:
     def __init__(self, name, title, description, modules, category):
         self.category = category
@@ -39,38 +41,30 @@ class Clip:
 
 
 class Catalog:
-    def __init__(self, data):
-        raw_courses = data["Courses"]
-        raw_modules = data["Modules"]
-        raw_authors = data["Authors"]
-        raw_categories = data["Categories"]
+    def __init__(self, database, data= None):
+        if data is not None:
+            raw_courses = data["Courses"]
+            raw_modules = data["Modules"]
+            raw_authors = data["Authors"]
+            raw_categories = data["Categories"]
+            cursor = database.cursor()
 
-        courses = []
-        for course in raw_courses:
-            modules = course["Modules"]
-            modules_indexes = modules.split(',')
-            raw_course_modules = [raw_modules[int(x)] for x in modules_indexes]
+            courses = []
+            for course in raw_courses:
 
-            course_modules = []
-            for module in raw_course_modules:
-                module_author = raw_authors[int(module["Author"])]
+                courses.append((
+                    course["Title"],
+                    course["Description"],
+                    raw_categories[int(course["Category"])]))
 
-                clips = []
-                for i, clip in enumerate(module["Clips"]):
-                    clips.append(Clip(clip["Title"], clip["Duration"], i, course["Name"], module_author["Handle"], module["Name"]))
+            cursor.executemany('INSERT INTO course VALUES (?,?,?)', courses)
+            database.commit()
 
-                author = Author(module_author["DisplayName"], module_author["Handle"])
-                course_modules.append(Module(module["Name"], module["Title"], clips, author, module["Duration"]))
+        self.database = database
 
-            courses.append(
-                Course(course["Name"],
-                       course["Title"].encode('UTF8'),
-                       course["Description"],
-                       course_modules,
-                       raw_categories[int(course["Category"])]))
-        self.authors = sorted([Author(x["DisplayName"], x["Handle"]) for x in raw_authors], key=lambda author : author.display_name)
-        self.categories = [x for x in raw_categories]
-        self.courses = sorted(courses, key=lambda course: course.title)
+    def get_courses(self):
+        cursor = self.database.cursor()
+        return cursor.execute('SELECT * FROM course').fetchall()
 
     def get_course_by_name(self, name):
         return filter(lambda x: x.name == name, self.courses)[0]
