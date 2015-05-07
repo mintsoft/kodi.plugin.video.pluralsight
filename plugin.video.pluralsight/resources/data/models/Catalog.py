@@ -105,7 +105,7 @@ class Catalog:
         self.database.execute('DELETE FROM clip')
         self.database.execute('DELETE FROM module')
         self.database.execute('DELETE FROM author')
-        
+
         self.database.execute('INSERT INTO cache_status (etag) VALUES(?)', (etag,))
 
         for author in raw_authors:
@@ -130,7 +130,11 @@ class Catalog:
         self.database.commit()
 
     def get_etag(self):
-        return self.database.cursor().execute('SELECT etag FROM cache_status').fetchone()
+        etag_from_db = self.database.cursor().execute('SELECT etag FROM cache_status').fetchone()
+        etag = ""
+        if etag_from_db is not None:
+            etag = etag_from_db[0]
+        return etag
 
     def get_courses(self):
         return self.database.cursor().execute('SELECT * FROM course').fetchall()

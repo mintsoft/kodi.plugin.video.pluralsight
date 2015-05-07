@@ -107,15 +107,14 @@ if not credentials_are_valid():
 cached = args.get('cached', None)
 debug_log_duration("pre-cache")
 if cached is None and DEBUG is not True:
-    e_tag = ""
-
     catalog = Catalog.Catalog(database_path)
 
+    etag = catalog.get_etag()
     cache_headers = {"Accept-Language": "en-us",
                      "Content-Type": "application/json",
                      "Accept": "application/json",
                      "Accept-Encoding": "gzip",
-                     "If-None-Match": catalog.get_etag()}
+                     "If-None-Match": etag}
 
     debug_log_duration("pre-get")
     r = requests.get("http://www.pluralsight.com/metadata/live/courses/", headers=cache_headers)
