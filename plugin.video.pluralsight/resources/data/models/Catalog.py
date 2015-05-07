@@ -99,6 +99,7 @@ class Catalog:
         raw_categories = data["Categories"]
         # cursor = database.cursor()
 
+        self.database.execute('DELETE FROM cache_status')
         self.database.execute('DELETE FROM category')
         self.database.execute('DELETE FROM course')
         self.database.execute('DELETE FROM clip')
@@ -124,10 +125,12 @@ class Catalog:
             self.database.execute('INSERT INTO course(name, description, category_id) VALUES (?,?,?)',
                                   course["Title"], course["Description"], int(course["Category"]))
 
+        self.database.execute('INSERT INTO cache_status (etag) VALUES(?)', etag)
+
         self.database.commit()
 
     def get_etag(self):
-        return self.database.cursor().execute('SELECT tag FROM cache_status').fetchone()
+        return self.database.cursor().execute('SELECT etag FROM cache_status').fetchone()
 
     def get_courses(self):
         return self.database.cursor().execute('SELECT * FROM course').fetchall()

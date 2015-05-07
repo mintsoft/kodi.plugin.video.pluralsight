@@ -1,8 +1,6 @@
 import os
 import sys
 import time
-
-import cPickle
 import urllib
 import urlparse
 
@@ -12,9 +10,6 @@ import xbmcplugin
 import xbmcgui
 from resources.lib import requests
 from resources.data.models import Catalog
-
-import sqlite3
-
 
 start_time = time.time()
 
