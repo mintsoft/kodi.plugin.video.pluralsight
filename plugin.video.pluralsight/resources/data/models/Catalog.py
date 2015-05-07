@@ -12,11 +12,11 @@ class Course:
 
 
 class Module:
-    def __init__(self, name, tile, clips, author, duration):
+    def __init__(self, name, title, clips, author, duration):
         self.duration = duration
         self.author = author
         self.name = name
-        self.title = tile
+        self.title = title
         self.clips = clips
 
 
@@ -61,13 +61,12 @@ class Catalog:
                 CREATE TABLE course (
                     id INTEGER PRIMARY KEY ASC,
                     name TEXT,
+                    title TEXT,
+                    category_id INTEGER,
                     description TEXT,
-                    category_id INTEGER
-                ) ''')
-            database.execute('''
-                CREATE TABLE category (
-                    id INTEGER PRIMARY KEY ASC,
-                    name TEXT
+                    level TEXT,
+                    duration INTEGER,
+                    is_new INTEGER
                 ) ''')
             database.execute('''
                 CREATE TABLE module (
@@ -76,6 +75,17 @@ class Catalog:
                     name TEXT,
                     title TEXT,
                     duration INT
+                ) ''')
+            database.execute('''
+                CREATE TABLE course_module (
+                    course_id INTEGER,
+                    module_id INTEGER,
+                    PRIMARY KEY(course_id, module_id)
+                ) ''')
+            database.execute('''
+                CREATE TABLE category (
+                    id INTEGER PRIMARY KEY ASC,
+                    name TEXT
                 ) ''')
             database.execute('''
                 CREATE TABLE clip (
@@ -97,7 +107,6 @@ class Catalog:
         raw_modules = data["Modules"]
         raw_authors = data["Authors"]
         raw_categories = data["Categories"]
-        # cursor = database.cursor()
 
         self.database.execute('DELETE FROM cache_status')
         self.database.execute('DELETE FROM category')
@@ -124,8 +133,14 @@ class Catalog:
                                       (module_id, clip["Title"], clip["Duration"]))
 
         for course in raw_courses:
-            self.database.execute('INSERT INTO course(name, description, category_id) VALUES (?,?,?)',
-                                  (course["Title"], course["Description"], int(course["Category"])))
+            result = self.database.execute(
+                'INSERT INTO course(name, description, category_id, title, level, duration, is_new) VALUES (?,?,?,?,?,?,?)',
+                (course["Title"], course["Description"], int(course["Category"]), course["Title"], course["Level"],
+                 course["Duration"], course["New"]))
+            course_id = result.lastrowid
+            for module_id in course["Modules"].split(","):
+                self.database.execute('INSERT INTO course_module(course_id, module_id) VALUES(?,?)',
+                                      (course_id, int(module_id)))
 
         self.database.commit()
 
@@ -141,7 +156,16 @@ class Catalog:
         return self.database.cursor().execute('SELECT * FROM course').fetchall()
 
     def get_course_by_name(self, name):
-        return self.database.cursor().execute('SELECT * FROM course WHERE name=?', (name,)).fetchone()
+        resultset = self.database.cursor().execute('SELECT id, title, description, category_id FROM course WHERE name=?', (name,)).fetchall()[0]
+        modules = self.database.cursor().execute('''
+                SELECT module.id, module.title FROM module
+                    INNER JOIN course_module
+                        ON course_module.module_id = module.id
+                    WHERE course_module.course_id = ?
+            ''', (resultset[0],)).fetchall()
+        course = Course(name, resultset[1], resultset[2], modules, resultset[3])
+
+        return course
 
     def get_course_by_title(self, title):
         return self.database.cursor().execute('SELECT * FROM course WHERE title=?', (title,)).fetchone()

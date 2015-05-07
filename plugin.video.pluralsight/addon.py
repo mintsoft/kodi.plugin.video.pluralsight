@@ -3,6 +3,7 @@ import sys
 import time
 import urllib
 import urlparse
+import json
 
 import xbmc
 import xbmcaddon
@@ -174,9 +175,10 @@ elif mode[0] == MODE_COURSES:
 
 elif mode[0] == MODE_MODULES:
     title = args.get('course', None)
-    for module in catalog.get_course_by_name(title[0]).modules:
-        url = build_url({'mode': MODE_CLIPS, 'course': title[0], 'module': module.title, 'cached': 'true'})
-        li = xbmcgui.ListItem(module.title, iconImage='DefaultFolder.png')
+    course = catalog.get_course_by_name(title[0])
+    for module in course.modules:
+        url = build_url({'mode': MODE_CLIPS, 'course': title[0], 'module': module[1], 'cached': 'true'})
+        li = xbmcgui.ListItem(module[1], iconImage='DefaultFolder.png')
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
     debug_log_duration("finished modules output")
 
