@@ -105,13 +105,15 @@ class Catalog:
         self.database.execute('DELETE FROM clip')
         self.database.execute('DELETE FROM module')
         self.database.execute('DELETE FROM author')
+        
+        self.database.execute('INSERT INTO cache_status (etag) VALUES(?)', (etag,))
 
         for author in raw_authors:
             self.database.execute('INSERT INTO author(handle, displayname) VALUES(?,?)',
                                   (author["Handle"], author["DisplayName"]))
 
         for category in raw_categories:
-            self.database.execute('INSERT INTO category(name) VALUES(?)', category)
+            self.database.execute('INSERT INTO category(name) VALUES(?)', (category,))
 
         for module in raw_modules:
             result = self.database.execute('INSERT INTO module(author, name, title, duration) VALUES(?,?,?,?)',
@@ -124,8 +126,6 @@ class Catalog:
         for course in raw_courses:
             self.database.execute('INSERT INTO course(name, description, category_id) VALUES (?,?,?)',
                                   (course["Title"], course["Description"], int(course["Category"])))
-
-        self.database.execute('INSERT INTO cache_status (etag) VALUES(?)', etag)
 
         self.database.commit()
 
