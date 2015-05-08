@@ -59,7 +59,7 @@ class Catalog:
                 ) ''')
             database.execute('''
                 CREATE TABLE course (
-                    id INTEGER PRIMARY KEY ASC,
+                    id INTEGER,
                     name TEXT,
                     title TEXT,
                     category_id INTEGER,
@@ -70,7 +70,7 @@ class Catalog:
                 ) ''')
             database.execute('''
                 CREATE TABLE module (
-                    id INTEGER PRIMARY KEY ASC,
+                    id INTEGER,
                     author INT,
                     name TEXT,
                     title TEXT,
@@ -124,23 +124,23 @@ class Catalog:
         for category in raw_categories:
             self.database.execute('INSERT INTO category(name) VALUES(?)', (category,))
 
-        for module in raw_modules:
-            result = self.database.execute('INSERT INTO module(author, name, title, duration) VALUES(?,?,?,?)',
-                                           (int(module["Author"]), module["Name"], module["Title"], module["Duration"]))
+        for index,module in enumerate(raw_modules):
+            result = self.database.execute('INSERT INTO module(id,author, name, title, duration) VALUES(?,?,?,?,?)',
+                                           (index,int(module["Author"]), module["Name"], module["Title"], module["Duration"]))
             module_id = result.lastrowid
             for clip in module["Clips"]:
                 self.database.execute('INSERT INTO clip (module_id, title, duration) VALUES(?,?,?)',
                                       (module_id, clip["Title"], clip["Duration"]))
 
-        for course in raw_courses:
+        for index,course in enumerate(raw_courses):
             result = self.database.execute(
-                'INSERT INTO course(name, description, category_id, title, level, duration, is_new) VALUES (?,?,?,?,?,?,?)',
-                (course["Title"], course["Description"], int(course["Category"]), course["Title"], course["Level"],
+                'INSERT INTO course(id,name, description, category_id, title, level, duration, is_new) VALUES (?,?,?,?,?,?,?,?)',
+                (index,course["Title"], course["Description"], int(course["Category"]), course["Title"], course["Level"],
                  course["Duration"], course["New"]))
             course_id = result.lastrowid
             for module_id in course["Modules"].split(","):
                 self.database.execute('INSERT INTO course_module(course_id, module_id) VALUES(?,?)',
-                                      (course_id, int(module_id)))
+                                      (index, int(module_id)))
 
         self.database.commit()
 
