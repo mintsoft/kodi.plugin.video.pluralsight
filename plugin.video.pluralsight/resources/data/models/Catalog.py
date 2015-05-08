@@ -1,14 +1,14 @@
 import sqlite3
 import os
+import urllib
 
 
 class Course:
-    def __init__(self, name, title, description, modules, category):
+    def __init__(self, name, title, description, category):
         self.category = category
         self.description = description
         self.title = title
         self.name = name
-        self.modules = modules
 
 
 class Module:
@@ -53,7 +53,7 @@ class Catalog:
                 ) ''')
             database.execute('''
                 CREATE TABLE author (
-                    id INTEGER PRIMARY KEY ASC,
+                    id INTEGER,
                     handle TEXT,
                     displayname TEXT
                 ) ''')
@@ -84,12 +84,12 @@ class Catalog:
                 ) ''')
             database.execute('''
                 CREATE TABLE category (
-                    id INTEGER PRIMARY KEY ASC,
+                    id INTEGER,
                     name TEXT
                 ) ''')
             database.execute('''
                 CREATE TABLE clip (
-                    id INTEGER PRIMARY KEY ASC,
+                    id INTEGER,
                     module_id INT,
                     title TEXT,
                     duration TEXT
@@ -99,6 +99,7 @@ class Catalog:
         else:
             database = sqlite3.connect(database_path)
 
+        database.row_factory = sqlite3.Row
         self.database = database
 
     def update(self, etag, data):
@@ -117,30 +118,30 @@ class Catalog:
 
         self.database.execute('INSERT INTO cache_status (etag) VALUES(?)', (etag,))
 
-        for author in raw_authors:
-            self.database.execute('INSERT INTO author(handle, displayname) VALUES(?,?)',
-                                  (author["Handle"], author["DisplayName"]))
+        for author_index,author in enumerate(raw_authors):
+            self.database.execute('INSERT INTO author(id,handle, displayname) VALUES(?,?,?)',
+                                  (author_index, author["Handle"], author["DisplayName"]))
 
-        for category in raw_categories:
-            self.database.execute('INSERT INTO category(name) VALUES(?)', (category,))
+        for category_index,category in enumerate(raw_categories):
+            self.database.execute('INSERT INTO category(id,name) VALUES(?,?)', (category_index,category,))
 
-        for index,module in enumerate(raw_modules):
-            result = self.database.execute('INSERT INTO module(id,author, name, title, duration) VALUES(?,?,?,?,?)',
-                                           (index,int(module["Author"]), module["Name"], module["Title"], module["Duration"]))
-            module_id = result.lastrowid
-            for clip in module["Clips"]:
-                self.database.execute('INSERT INTO clip (module_id, title, duration) VALUES(?,?,?)',
-                                      (module_id, clip["Title"], clip["Duration"]))
+        for module_index,module in enumerate(raw_modules):
+            self.database.execute('INSERT INTO module(id,author, name, title, duration) VALUES(?,?,?,?,?)',
+                                           (module_index,int(module["Author"]), module["Name"], module["Title"], module["Duration"]))
 
-        for index,course in enumerate(raw_courses):
-            result = self.database.execute(
+            for clip_index, clip in enumerate(module["Clips"]):
+                self.database.execute('INSERT INTO clip (id, module_id, title, duration) VALUES(?,?,?,?)',
+                                      (clip_index, module_index, clip["Title"], clip["Duration"]))
+
+        for course_index, course in enumerate(raw_courses):
+            self.database.execute(
                 'INSERT INTO course(id,name, description, category_id, title, level, duration, is_new) VALUES (?,?,?,?,?,?,?,?)',
-                (index,course["Title"], course["Description"], int(course["Category"]), course["Title"], course["Level"],
+                (course_index,course["Name"], course["Description"], int(course["Category"]), course["Title"], course["Level"],
                  course["Duration"], course["New"]))
-            course_id = result.lastrowid
+
             for module_id in course["Modules"].split(","):
                 self.database.execute('INSERT INTO course_module(course_id, module_id) VALUES(?,?)',
-                                      (index, int(module_id)))
+                                      (course_index, int(module_id)))
 
         self.database.commit()
 
@@ -155,23 +156,40 @@ class Catalog:
     def courses(self):
         return self.database.cursor().execute('SELECT * FROM course').fetchall()
 
+    @property
+    def categories(self):
+        return self.database.cursor().execute('SELECT * FROM category').fetchall()
+
     def get_course_by_name(self, name):
-        resultset = self.database.cursor().execute('SELECT id, title, description, category_id FROM course WHERE name=?', (name,)).fetchall()[0]
+        return self.database.cursor().execute('SELECT id, title, description, category_id FROM course WHERE name=?', (name,)).fetchone()
+
+    def get_modules_by_course_id(self, course_id):
         modules = self.database.cursor().execute('''
                 SELECT module.id, module.title FROM module
                     INNER JOIN course_module
                         ON course_module.module_id = module.id
                     WHERE course_module.course_id = ?
-            ''', (resultset[0],)).fetchall()
-        course = Course(name, resultset[1], resultset[2], modules, resultset[3])
+            ''', (course_id,)).fetchall()
+        return modules
 
-        return course
+    def get_clips_by_module_id(self,module_id,course_id):
+        clips = []
+        raw_course = self.database.cursor().execute('SELECT * FROM course WHERE id=?', (course_id,)).fetchone()
+        raw_module = self.database.cursor().execute('SELECT * FROM module WHERE id=?', (module_id,)).fetchone()
+        raw_author = self.database.cursor().execute('SELECT * FROM author WHERE id=?', (raw_module["author"],)).fetchone()
+
+        raw_clips = self.database.cursor().execute('SELECT * FROM clip WHERE module_id=?', (module_id,)).fetchall()
+        for clip in raw_clips:
+            clips.append(Clip(clip["title"], clip["duration"] ,clip["id"], raw_course["name"] ,raw_author["handle"], raw_module["name"]))
+
+        return clips
 
     def get_course_by_title(self, title):
         return self.database.cursor().execute('SELECT * FROM course WHERE title=?', (title,)).fetchone()
 
-    def get_courses_by_category(self, category):
-        return self.database.cursor().execute('SELECT * FROM course WHERE category_id=?', int(category)).fetchall()
+    def get_courses_by_category_id(self, category_id):
+        return self.database.cursor().execute('SELECT * FROM course WHERE category_id=?', (category_id,)).fetchall()
 
     def close_db(self):
         self.database.close()
+
