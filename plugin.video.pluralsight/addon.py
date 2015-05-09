@@ -3,7 +3,6 @@ import sys
 import time
 import urllib
 import urlparse
-import json
 
 import xbmc
 import xbmcaddon
@@ -21,6 +20,7 @@ MODE_COURSES = 'courses'
 MODE_MODULES = 'modules'
 MODE_COURSE_BY_CATEGORY = 'courses_by_category'
 MODE_CLIPS = 'clips'
+MODE_FAVOURITES = 'favourites'
 
 DEBUG = False
 # endregion
@@ -161,15 +161,24 @@ if mode is None:
     li = xbmcgui.ListItem('Categories', iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
+    url = build_url({'mode': MODE_FAVOURITES, 'cached': 'true'})
+    li = xbmcgui.ListItem('Favourites', iconImage='DefaultFolder.png')
+    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+
     url = build_url({'mode': MODE_SEARCH, 'cached': 'true'})
     li = xbmcgui.ListItem('Search', iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+
     debug_log_duration("finished default mode")
 
 elif mode[0] == MODE_COURSES:
     for course in catalog.courses:
         url = build_url({'mode': MODE_MODULES, 'course_id': course["id"], 'cached': 'true'})
         li = xbmcgui.ListItem(course["title"], iconImage='DefaultFolder.png')
+        li.addContextMenuItems([('Add to Favourite Courses',
+                                 'XBMC.RunScript(special://home/addons/plugin.video.pluralsight/resources/data/models/Favourites.py, %s, %s, %s)'
+                                 % (course["id"],course["title"].replace(",",""),database_path) ,
+                                 True)])
         li.setInfo('video', {'plot': course["description"], 'genre': course["category_id"], 'title':course["title"]})
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
     debug_log_duration("finished courses output")
@@ -220,6 +229,11 @@ elif mode[0] == MODE_SEARCH:
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
     debug_log_duration("finished search output")
 
+elif mode[0] == MODE_FAVOURITES:
+    for favourite in catalog.favourites:
+        url = build_url({'mode': MODE_MODULES, 'course_id': favourite["course_id"], 'cached': 'true'})
+        li = xbmcgui.ListItem(favourite["title"], iconImage='DefaultFolder.png')
+        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
 catalog.close_db()
 

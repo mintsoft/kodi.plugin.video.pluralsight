@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f1acf36c-a014-4408-85ad-390d1b7cc41a" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Favourites.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Catalog.py" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Catalog.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugin.video.pluralsight/addon.py" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/addon.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
@@ -34,9 +35,21 @@
       <file leaf-file-name="addon.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/addon.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.7649044" vertical-offset="2040" max-vertical-offset="3740">
-              <caret line="172" column="113" selection-start-line="172" selection-start-column="113" selection-end-line="172" selection-end-column="113" />
+            <state vertical-scroll-proportion="0.67009133" vertical-offset="2099" max-vertical-offset="3995">
+              <caret line="169" column="89" selection-start-line="169" selection-start-column="89" selection-end-line="169" selection-end-column="89" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Favourites.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Favourites.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="255">
+              <caret line="8" column="60" selection-start-line="8" selection-start-column="60" selection-end-line="8" selection-end-column="60" />
+              <folding>
+                <element signature="e#0#10#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -44,8 +57,8 @@
       <file leaf-file-name="Catalog.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Catalog.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1353" max-vertical-offset="3417">
-              <caret line="114" column="51" selection-start-line="114" selection-start-column="51" selection-end-line="114" selection-end-column="51" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="2800" max-vertical-offset="3689">
+              <caret line="124" column="0" selection-start-line="124" selection-start-column="0" selection-end-line="124" selection-end-column="0" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
@@ -68,6 +81,8 @@
         <option value="$PROJECT_DIR$/plugin.video.pluralsight/resources/__init__.py" />
         <option value="$PROJECT_DIR$/plugin.video.pluralsight/resources/data/__init__.py" />
         <option value="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/__init__.py" />
+        <option value="$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Favrouties.py" />
+        <option value="$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Favourites.py" />
         <option value="$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Catalog.py" />
         <option value="$PROJECT_DIR$/plugin.video.pluralsight/addon.py" />
       </list>
@@ -171,7 +186,33 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="lib" />
+              <option name="myItemId" value="data" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kodi.plugin.video.pluralsight" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kodi.plugin.video.pluralsight" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="plugin.video.pluralsight" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="resources" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="data" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="models" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -766,10 +807,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Favourites.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="255">
+          <caret line="8" column="60" selection-start-line="8" selection-start-column="60" selection-end-line="8" selection-end-column="60" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Catalog.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1353" max-vertical-offset="3417">
-          <caret line="114" column="51" selection-start-line="114" selection-start-column="51" selection-end-line="114" selection-end-column="51" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="2800" max-vertical-offset="3689">
+          <caret line="124" column="0" selection-start-line="124" selection-start-column="0" selection-end-line="124" selection-end-column="0" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
           </folding>
@@ -778,8 +829,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/addon.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.7649044" vertical-offset="2040" max-vertical-offset="3740">
-          <caret line="172" column="113" selection-start-line="172" selection-start-column="113" selection-end-line="172" selection-end-column="113" />
+        <state vertical-scroll-proportion="0.67009133" vertical-offset="2099" max-vertical-offset="3995">
+          <caret line="169" column="89" selection-start-line="169" selection-start-column="89" selection-end-line="169" selection-end-column="89" />
           <folding />
         </state>
       </provider>

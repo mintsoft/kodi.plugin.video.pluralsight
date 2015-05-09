@@ -93,6 +93,11 @@ class Catalog:
                     title TEXT,
                     duration TEXT
                 ) ''')
+            database.execute('''
+                CREATE TABLE favourite (
+                    course_id INT,
+                    title TEXT
+                ) ''')
 
             database.commit()
         else:
@@ -160,6 +165,10 @@ class Catalog:
     def categories(self):
         return self.database.cursor().execute('SELECT * FROM category').fetchall()
 
+    @property
+    def favourites(self):
+        return self.database.cursor().execute('SELECT * FROM favourite').fetchall()
+
     def get_course_by_name(self, name):
         return self.database.cursor().execute('SELECT id, title, description, category_id FROM course WHERE name=?', (name,)).fetchone()
 
@@ -192,4 +201,11 @@ class Catalog:
 
     def close_db(self):
         self.database.close()
+
+    @staticmethod
+    def add_favourite(course_id, title, database_path):
+         database = sqlite3.connect(database_path)
+         database.execute('INSERT INTO favourite(course_id, title) VALUES(?,?)',(course_id, title,))
+         database.commit()
+         database.close()
 
