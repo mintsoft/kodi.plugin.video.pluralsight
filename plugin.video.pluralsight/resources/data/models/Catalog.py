@@ -1,6 +1,6 @@
 import sqlite3
 import os
-
+from random import randint
 
 class Course:
     def __init__(self, name, title, description, category):
@@ -195,6 +195,13 @@ class Catalog:
 
     def get_course_by_title(self, title):
         return self.database.cursor().execute('SELECT * FROM course WHERE title=?', (title,)).fetchone()
+
+    def get_random_course(self):
+        max_id = self.database.cursor().execute('SELECT MAX(id) FROM course').fetchone()[0]
+        min_id = self.database.cursor().execute('SELECT MIN(id) FROM course').fetchone()[0]
+        course_id = randint(min_id,max_id)
+        return self.database.cursor().execute('SELECT * FROM course WHERE id =?',(course_id,)).fetchone()
+
 
     def get_courses_by_category_id(self, category_id):
         return self.database.cursor().execute('SELECT * FROM course WHERE category_id=?', (category_id,)).fetchall()

@@ -21,6 +21,7 @@ MODE_MODULES = 'modules'
 MODE_COURSE_BY_CATEGORY = 'courses_by_category'
 MODE_CLIPS = 'clips'
 MODE_FAVOURITES = 'favourites'
+MODE_RANDOM = 'random'
 
 DEBUG = False
 # endregion
@@ -169,6 +170,10 @@ if mode is None:
     li = xbmcgui.ListItem('Search', iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
+    url = build_url({'mode': MODE_RANDOM, 'cached': 'true'})
+    li = xbmcgui.ListItem('Learn Something New', iconImage='DefaultFolder.png')
+    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+
     debug_log_duration("finished default mode")
 
 elif mode[0] == MODE_COURSES:
@@ -234,6 +239,17 @@ elif mode[0] == MODE_FAVOURITES:
         url = build_url({'mode': MODE_MODULES, 'course_id': favourite["course_id"], 'cached': 'true'})
         li = xbmcgui.ListItem(favourite["title"], iconImage='DefaultFolder.png')
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+
+elif mode[0] == MODE_RANDOM:
+    course = catalog.get_random_course()
+    url = build_url({'mode': MODE_MODULES, 'course_id': course["id"], 'cached': 'true'})
+    li = xbmcgui.ListItem(course["title"], iconImage='DefaultFolder.png')
+    li.addContextMenuItems([('Add to Favourite Courses',
+                             'XBMC.RunScript(special://home/addons/plugin.video.pluralsight/resources/data/models/Favourites.py, %s, %s, %s)'
+                             % (course["id"],course["title"].replace(",",""),database_path) ,
+                             True)])
+    li.setInfo('video', {'plot': course["description"], 'genre': course["category_id"], 'title':course["title"]})
+    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
 catalog.close_db()
 
