@@ -1,6 +1,5 @@
 import sqlite3
 import os
-import urllib
 
 
 class Course:
@@ -115,6 +114,7 @@ class Catalog:
         self.database.execute('DELETE FROM clip')
         self.database.execute('DELETE FROM module')
         self.database.execute('DELETE FROM author')
+        self.database.execute('DELETE FROM course_module')
 
         self.database.execute('INSERT INTO cache_status (etag) VALUES(?)', (etag,))
 
@@ -154,7 +154,7 @@ class Catalog:
 
     @property
     def courses(self):
-        return self.database.cursor().execute('SELECT * FROM course').fetchall()
+        return self.database.cursor().execute('SELECT * FROM course order by title asc').fetchall()
 
     @property
     def categories(self):

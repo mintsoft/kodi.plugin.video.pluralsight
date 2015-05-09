@@ -95,6 +95,7 @@ etag_path = os.path.join(temp_path, "pluralsight_etag.pkl")
 database_path = os.path.join(temp_path, 'pluralsight_catalog.db')
 
 xbmcplugin.setContent(addon_handle, 'movies')
+xbmcplugin.addSortMethod(addon_handle, xbmcplugin.SORT_METHOD_TITLE)
 
 username = xbmcplugin.getSetting(addon_handle, "username")
 password = xbmcplugin.getSetting(addon_handle, "password")
@@ -169,7 +170,7 @@ elif mode[0] == MODE_COURSES:
     for course in catalog.courses:
         url = build_url({'mode': MODE_MODULES, 'course_id': course["id"], 'cached': 'true'})
         li = xbmcgui.ListItem(course["title"], iconImage='DefaultFolder.png')
-        li.setInfo('video', {'plot': course["description"], 'genre': course["category_id"]})
+        li.setInfo('video', {'plot': course["description"], 'genre': course["category_id"], 'title':course["title"]})
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
     debug_log_duration("finished courses output")
 
