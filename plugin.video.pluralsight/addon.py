@@ -241,6 +241,11 @@ elif mode[0] == MODE_FAVOURITES:
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
 elif mode[0] == MODE_RANDOM:
+
+    url1 = build_url({'mode': MODE_RANDOM, 'cached': 'true'})
+    li1 = xbmcgui.ListItem('Pick a Different Course', iconImage='DefaultFolder.png')
+    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url1, listitem=li1, isFolder=True)
+
     course = catalog.get_random_course()
     url = build_url({'mode': MODE_MODULES, 'course_id': course["id"], 'cached': 'true'})
     li = xbmcgui.ListItem(course["title"], iconImage='DefaultFolder.png')
