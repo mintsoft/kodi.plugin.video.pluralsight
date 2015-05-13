@@ -159,7 +159,7 @@ class Catalog:
 
     @property
     def courses(self):
-        return self.database.cursor().execute('SELECT * FROM course order by title asc').fetchall()
+        return self.database.cursor().execute('SELECT * FROM course ORDER BY title asc').fetchall()
 
     @property
     def categories(self):
@@ -204,7 +204,7 @@ class Catalog:
 
 
     def get_courses_by_category_id(self, category_id):
-        return self.database.cursor().execute('SELECT * FROM course WHERE category_id=?', (category_id,)).fetchall()
+        return self.database.cursor().execute('SELECT * FROM course WHERE category_id=? ORDER BY title asc', (category_id,)).fetchall()
 
     def close_db(self):
         self.database.close()
