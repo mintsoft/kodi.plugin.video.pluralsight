@@ -182,7 +182,7 @@ elif mode[0] == MODE_COURSES:
         li = xbmcgui.ListItem(course["title"], iconImage='DefaultFolder.png')
         li.addContextMenuItems([('Add to Favourite Courses',
                                  'XBMC.RunScript(special://home/addons/plugin.video.pluralsight/resources/data/models/Favourites.py, %s, %s, %s)'
-                                 % (course["id"],course["title"].replace(",",""),database_path) ,
+                                 % (course["name"],course["title"].replace(",",""),database_path) ,
                                  True)])
         li.setInfo('video', {'plot': course["description"], 'genre': course["category_id"], 'title':course["title"]})
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
@@ -208,6 +208,10 @@ elif mode[0] == MODE_COURSE_BY_CATEGORY:
     for course in catalog.get_courses_by_category_id(category_id):
         url = build_url({'mode': MODE_MODULES, 'course_id': course["id"], 'cached': 'true'})
         li = xbmcgui.ListItem(course["title"], iconImage='DefaultFolder.png')
+        li.addContextMenuItems([('Add to Favourite Courses',
+                                 'XBMC.RunScript(special://home/addons/plugin.video.pluralsight/resources/data/models/Favourites.py, %s, %s, %s)'
+                                 % (course["name"],course["title"].replace(",",""),database_path) ,
+                                 True)])
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
 elif mode[0] == MODE_CLIPS:
@@ -236,7 +240,8 @@ elif mode[0] == MODE_SEARCH:
 
 elif mode[0] == MODE_FAVOURITES:
     for favourite in catalog.favourites:
-        url = build_url({'mode': MODE_MODULES, 'course_id': favourite["course_id"], 'cached': 'true'})
+        course = catalog.get_course_by_name(favourite["course_name"])
+        url = build_url({'mode': MODE_MODULES, 'course_id':course["id"], 'cached': 'true'})
         li = xbmcgui.ListItem(favourite["title"], iconImage='DefaultFolder.png')
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
