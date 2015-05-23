@@ -259,7 +259,7 @@ elif mode[0] == MODE_RANDOM:
     li = xbmcgui.ListItem(course["title"], iconImage='DefaultFolder.png')
     li.addContextMenuItems([('Add to Favourite Courses',
                              'XBMC.RunScript(special://home/addons/plugin.video.pluralsight/resources/data/models/Favourites.py, %s, %s, %s)'
-                             % (course["id"],course["title"].replace(",",""),database_path) ,
+                             % (course["name"],course["title"].replace(",",""),database_path) ,
                              True)])
     li.setInfo('video', {'plot': course["description"], 'genre': course["category_id"], 'title':course["title"]})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
@@ -275,7 +275,7 @@ elif mode[0] == MODE_PLAY:
     url = clip.get_url(username)
     video_url = get_video_url(url, auth["Token"])
     li = xbmcgui.ListItem(label=clip_title, path=video_url)
-    xbmcplugin.setResolvedUrl(handle=int(sys.argv[1]), succeeded=True, listitem=li)
+    xbmcplugin.setResolvedUrl(handle=addon_handle, succeeded=True, listitem=li)
 
 catalog.close_db()
 
