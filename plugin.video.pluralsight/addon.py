@@ -71,11 +71,14 @@ def get_video_url(video_url, token):
     response = requests.post(video_url, data=payload, headers=video_headers)
     return response.json()["VideoUrl"]
 
-def add_favourites_context_menu(li,course_name,course_title, database_path):
+def add_context_menu(li,course_name,course_title, database_path):
     li.addContextMenuItems([('Add to Favourite Courses',
                              'XBMC.RunScript(special://home/addons/plugin.video.pluralsight/resources/data/models/Favourites.py, %s, %s, %s)'
                              % (course_name, course_title.replace(",",""),database_path) ,
-                             True)])
+                             True),
+                            ('Toggle watched', 'Action(ToggleWatched)')
+                            ])
+
 
 # endregion
 
@@ -187,7 +190,7 @@ elif mode[0] == MODE_COURSES:
     for course in catalog.courses:
         url = build_url({'mode': MODE_MODULES, 'course_id': course["id"], 'cached': 'true'})
         li = xbmcgui.ListItem(course["title"], iconImage='DefaultFolder.png')
-        add_favourites_context_menu(li,course["name"],course["title"],database_path)
+        add_context_menu(li,course["name"],course["title"],database_path)
         li.setInfo('video', {'plot': course["description"], 'genre': course["category_id"], 'title':course["title"]})
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
     debug_log_duration("finished courses output")
@@ -199,7 +202,7 @@ elif mode[0] == MODE_MODULES:
     for module in modules:
         url = build_url({'mode': MODE_CLIPS, 'course_id': course_id, 'module_id': module["id"], 'cached': 'true'})
         li = xbmcgui.ListItem(module["title"], iconImage='DefaultFolder.png')
-        add_favourites_context_menu(li,course["name"],course["title"],database_path)
+        add_context_menu(li,course["name"],course["title"],database_path)
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
     debug_log_duration("finished modules output")
 
@@ -214,7 +217,7 @@ elif mode[0] == MODE_COURSE_BY_CATEGORY:
     for course in catalog.get_courses_by_category_id(category_id):
         url = build_url({'mode': MODE_MODULES, 'course_id': course["id"], 'cached': 'true'})
         li = xbmcgui.ListItem(course["title"], iconImage='DefaultFolder.png')
-        add_favourites_context_menu(li,course["name"],course["title"],database_path)
+        add_context_menu(li,course["name"],course["title"],database_path)
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
 elif mode[0] == MODE_CLIPS:
@@ -229,7 +232,7 @@ elif mode[0] == MODE_CLIPS:
         li = xbmcgui.ListItem(clip.title, iconImage='DefaultVideo.png')
         li.addStreamInfo('video', {'width': 1024, 'height': 768, 'duration': clip.duration})
         li.setProperty('IsPlayable', 'true')
-        add_favourites_context_menu(li,course["name"],course["title"],database_path)
+        add_context_menu(li,course["name"],course["title"],database_path)
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li)
     debug_log_duration("finished clips output")
 
@@ -242,7 +245,7 @@ elif mode[0] == MODE_SEARCH:
         course = catalog.get_course_by_name(course_name)
         url = build_url({'mode': MODE_MODULES, 'course_id': course["id"], 'cached': 'true'})
         li = xbmcgui.ListItem(course["title"], iconImage='DefaultFolder.png')
-        add_favourites_context_menu(li,course["name"],course["title"],database_path)
+        add_context_menu(li,course["name"],course["title"],database_path)
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
     debug_log_duration("finished search output")
 
@@ -261,7 +264,7 @@ elif mode[0] == MODE_RANDOM:
     course = catalog.get_random_course()
     url = build_url({'mode': MODE_MODULES, 'course_id': course["id"], 'cached': 'true'})
     li = xbmcgui.ListItem(course["title"], iconImage='DefaultFolder.png')
-    add_favourites_context_menu(li,course["name"],course["title"],database_path)
+    add_context_menu(li,course["name"],course["title"],database_path)
     li.setInfo('video', {'plot': course["description"], 'genre': course["category_id"], 'title':course["title"]})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
