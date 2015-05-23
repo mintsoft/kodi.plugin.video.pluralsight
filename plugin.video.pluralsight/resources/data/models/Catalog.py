@@ -1,6 +1,8 @@
 import sqlite3
 import os
 from random import randint
+import string
+
 
 class Course:
     def __init__(self, name, title, description, category):
@@ -135,8 +137,9 @@ class Catalog:
                                            (module_index,int(module["Author"]), module["Name"], module["Title"], module["Duration"]))
 
             for clip_index, clip in enumerate(module["Clips"]):
+                san_clip = filter(lambda x: x in string.printable, clip["Title"])
                 self.database.execute('INSERT INTO clip (id, module_id, title, duration) VALUES(?,?,?,?)',
-                                      (clip_index, module_index, clip["Title"], clip["Duration"]))
+                                      (clip_index, module_index, san_clip, clip["Duration"]))
 
         for course_index, course in enumerate(raw_courses):
             self.database.execute(
