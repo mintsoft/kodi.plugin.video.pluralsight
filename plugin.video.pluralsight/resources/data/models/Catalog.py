@@ -172,6 +172,12 @@ class Catalog:
     def get_course_by_name(self, name):
         return self.database.cursor().execute('SELECT * FROM course WHERE name=?', (name,)).fetchone()
 
+    def get_course_by_id(self, id):
+        return self.database.cursor().execute('SELECT * FROM course WHERE id=?', (id,)).fetchone()
+
+    def get_module_by_id(self, id):
+        return self.database.cursor().execute('SELECT * FROM module WHERE id=?', (id,)).fetchone()
+
     def get_modules_by_course_id(self, course_id):
         modules = self.database.cursor().execute('''
                 SELECT module.id, module.title FROM module
@@ -192,6 +198,16 @@ class Catalog:
             clips.append(Clip(clip["title"], clip["duration"] ,clip["id"], raw_course["name"] ,raw_author["handle"], raw_module["name"]))
 
         return clips
+
+    def get_clip_by_title(self,title,module_name,course_name):
+        raw_course = self.database.cursor().execute('SELECT * FROM course WHERE name=?', (course_name,)).fetchone()
+        raw_module = self.database.cursor().execute('SELECT * FROM module WHERE name=?', (module_name,)).fetchone()
+        raw_author = self.database.cursor().execute('SELECT * FROM author WHERE id=?', (raw_module["author"],)).fetchone()
+
+        clip = self.database.cursor().execute('SELECT * FROM clip WHERE module_id=? and title=?', (raw_module["id"],title,)).fetchone()
+
+        return Clip(clip["title"], clip["duration"] ,clip["id"], raw_course["name"] ,raw_author["handle"], raw_module["name"])
+
 
     def get_course_by_title(self, title):
         return self.database.cursor().execute('SELECT * FROM course WHERE title=?', (title,)).fetchone()

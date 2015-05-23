@@ -22,6 +22,7 @@ MODE_COURSE_BY_CATEGORY = 'courses_by_category'
 MODE_CLIPS = 'clips'
 MODE_FAVOURITES = 'favourites'
 MODE_RANDOM = 'random'
+MODE_PLAY = 'play'
 
 DEBUG = False
 # endregion
@@ -68,7 +69,7 @@ def get_video_url(video_url, token):
     video_headers = {"Content-Type": "application/x-www-form-urlencoded"}
     payload = {"Token": token}
     response = requests.post(video_url, data=payload, headers=video_headers)
-    return response.json()
+    return response.json()["VideoUrl"]
 
 # endregion
 
@@ -215,14 +216,17 @@ elif mode[0] == MODE_COURSE_BY_CATEGORY:
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
 elif mode[0] == MODE_CLIPS:
-    auth = login()
     module_id = args.get('module_id', None)[0]
     course_id = args.get('course_id', None)[0]
+
+    course = catalog.get_course_by_id(course_id)
+    module = catalog.get_module_by_id(module_id)
+
     for clip in catalog.get_clips_by_module_id(module_id,course_id):
-        clip_url = clip.get_url(xbmcplugin.getSetting(addon_handle, "username"))
-        url = get_video_url(clip_url, auth["Token"])["VideoUrl"]
+        url = build_url({'mode': MODE_PLAY, 'clip_title': clip.title ,'module_name': module["name"], 'course_name': course["name"], 'cached': 'true'})
         li = xbmcgui.ListItem(clip.title, iconImage='DefaultVideo.png')
         li.addStreamInfo('video', {'width': 1024, 'height': 768, 'duration': clip.duration})
+        li.setProperty('IsPlayable', 'true')
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li)
     debug_log_duration("finished clips output")
 
@@ -246,7 +250,6 @@ elif mode[0] == MODE_FAVOURITES:
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
 elif mode[0] == MODE_RANDOM:
-
     url1 = build_url({'mode': MODE_RANDOM, 'cached': 'true'})
     li1 = xbmcgui.ListItem('Pick a Different Course', iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url1, listitem=li1, isFolder=True)
@@ -260,6 +263,19 @@ elif mode[0] == MODE_RANDOM:
                              True)])
     li.setInfo('video', {'plot': course["description"], 'genre': course["category_id"], 'title':course["title"]})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+
+
+elif mode[0] == MODE_PLAY:
+    auth = login()
+    module_name = args.get('module_name', None)[0]
+    course_name = args.get('course_name', None)[0]
+    clip_title = args.get('clip_title', None)[0]
+
+    clip = catalog.get_clip_by_title(clip_title, module_name, course_name)
+    url = clip.get_url(username)
+    video_url = get_video_url(url, auth["Token"])
+    li = xbmcgui.ListItem(label=clip_title, path=video_url)
+    xbmcplugin.setResolvedUrl(handle=int(sys.argv[1]), succeeded=True, listitem=li)
 
 catalog.close_db()
 
