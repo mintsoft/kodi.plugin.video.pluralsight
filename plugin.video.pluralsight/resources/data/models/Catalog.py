@@ -53,6 +53,10 @@ class Catalog:
                     etag TEXT
                 ) ''')
             database.execute('''
+                CREATE TABLE auth (
+                    token TEXT
+                ) ''')
+            database.execute('''
                 CREATE TABLE author (
                     id INTEGER,
                     handle TEXT,
@@ -153,11 +157,23 @@ class Catalog:
 
         self.database.commit()
 
+    def update_token(self,token):
+        self.database.execute('DELETE FROM auth')
+        self.database.execute('INSERT INTO auth(token) VALUES(?)', (token,))
+        self.database.commit()
+
     @property
     def etag(self):
         etag_from_db = self.database.cursor().execute('SELECT etag FROM cache_status').fetchone()
         if etag_from_db is not None:
             return etag_from_db[0]
+        return ""
+
+    @property
+    def token(self):
+        token_from_db = self.database.cursor().execute('SELECT token FROM auth').fetchone()
+        if token_from_db is not None:
+            return token_from_db[0]
         return ""
 
     @property

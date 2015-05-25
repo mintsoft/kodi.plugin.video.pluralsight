@@ -26,7 +26,8 @@ MODE_PLAY = 'play'
 
 DEBUG = False
 # endregion
-
+class AuthorisationError(Exception):
+    """ Raise this exception when you cannot access a resource due to authentication issues """
 
 # region Global Functions
 def debug_log(string):
@@ -54,7 +55,7 @@ def credentials_are_valid():
     return True
 
 
-def login():
+def login(catalog):
     debug_log("Starting login")
     login_headers = {"Content-Type": "application/x-www-form-urlencoded"}
     payload = {"Password": password}
@@ -62,13 +63,17 @@ def login():
     debug_log("Using url: " + login_url)
     response = requests.post(login_url, data=payload, headers=login_headers)
     debug_log("Completed login, Response Code:" + str(response.status_code))
-    return response.json()
+    token = response.json()["Token"]
+    catalog.update_token(token)
+    return token
 
 
 def get_video_url(video_url, token):
     video_headers = {"Content-Type": "application/x-www-form-urlencoded"}
     payload = {"Token": token}
     response = requests.post(video_url, data=payload, headers=video_headers)
+    if response.status_code == 403:
+        raise AuthorisationError
     return response.json()["VideoUrl"]
 
 def add_context_menu(li,course_name,course_title, database_path):
@@ -272,14 +277,19 @@ elif mode[0] == MODE_RANDOM:
 
 
 elif mode[0] == MODE_PLAY:
-    auth = login()
     module_name = args.get('module_name', None)[0]
     course_name = args.get('course_name', None)[0]
     clip_title = args.get('clip_title', None)[0]
 
     clip = catalog.get_clip_by_title(clip_title, module_name, course_name)
     url = clip.get_url(username)
-    video_url = get_video_url(url, auth["Token"])
+    try:
+        video_url = get_video_url(url, catalog.token)
+    except AuthorisationError:
+        debug_log("Session has expired, re-authorising.")
+        token = login(catalog)
+        video_url = get_video_url(url, token)
+
     li = xbmcgui.ListItem(label=clip_title, path=video_url)
     xbmcplugin.setResolvedUrl(handle=addon_handle, succeeded=True, listitem=li)
 
