@@ -74,10 +74,9 @@ def get_video_url(video_url, token):
 def add_context_menu(li,course_name,course_title, database_path):
     li.addContextMenuItems([('Add to Favourite Courses',
                              'XBMC.RunScript(special://home/addons/plugin.video.pluralsight/resources/data/models/Favourites.py, %s, %s, %s)'
-                             % (course_name, course_title.replace(",",""),database_path) ,
-                             True),
+                             % (course_name, course_title.replace(",",""),database_path)),
                             ('Toggle watched', 'Action(ToggleWatched)')
-                            ])
+                            ], replaceItems= True)
 
 
 # endregion
@@ -254,6 +253,9 @@ elif mode[0] == MODE_FAVOURITES:
         course = catalog.get_course_by_name(favourite["course_name"])
         url = build_url({'mode': MODE_MODULES, 'course_id':course["id"], 'cached': 'true'})
         li = xbmcgui.ListItem(favourite["title"], iconImage='DefaultFolder.png')
+        li.addContextMenuItems([('Remove From Favourites',
+                             'XBMC.RunScript(special://home/addons/plugin.video.pluralsight/resources/data/models/Favourites.py, %s, %s)'
+                             % (course["name"],database_path), True)])
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
 elif mode[0] == MODE_RANDOM:

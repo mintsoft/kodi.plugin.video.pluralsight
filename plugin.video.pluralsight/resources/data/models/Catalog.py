@@ -235,3 +235,10 @@ class Catalog:
          database.commit()
          database.close()
 
+    @staticmethod
+    def remove_favourite(course_name, database_path):
+        database = sqlite3.connect(database_path)
+        database.execute('DELETE FROM favourite where course_name =?',(course_name,))
+        database.commit()
+        database.close()
+
