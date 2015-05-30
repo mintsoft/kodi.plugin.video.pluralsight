@@ -165,33 +165,21 @@ def search_for(search_criteria):
     response = requests.get(search_url, headers=search_headers)
     return response.json()
 
+def create_menu_item(name, mode):
+    url = build_url({'mode': mode, 'cached': 'true'})
+    li = xbmcgui.ListItem(name, iconImage='DefaultFolder.png')
+    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
 debug_log_duration("Pre-mode switch")
 if mode is None:
     debug_log("No mode, defaulting to main menu")
-    url = build_url({'mode': MODE_COURSES, 'cached': 'true'})
-    li = xbmcgui.ListItem('Courses', iconImage='DefaultFolder.png')
-    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
-    url = build_url({'mode': MODE_NEW_COURSES, 'cached': 'true'})
-    li = xbmcgui.ListItem('New Courses', iconImage='DefaultFolder.png')
-    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
-
-    url = build_url({'mode': MODE_CATEGORY, 'cached': 'true'})
-    li = xbmcgui.ListItem('Categories', iconImage='DefaultFolder.png')
-    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
-
-    url = build_url({'mode': MODE_FAVOURITES, 'cached': 'true'})
-    li = xbmcgui.ListItem('Favourites', iconImage='DefaultFolder.png')
-    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
-
-    url = build_url({'mode': MODE_SEARCH, 'cached': 'true'})
-    li = xbmcgui.ListItem('Search', iconImage='DefaultFolder.png')
-    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
-
-    url = build_url({'mode': MODE_RANDOM, 'cached': 'true'})
-    li = xbmcgui.ListItem('Learn Something New', iconImage='DefaultFolder.png')
-    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+    create_menu_item('Courses', MODE_COURSES)
+    create_menu_item('New Courses', MODE_NEW_COURSES)
+    create_menu_item('Categories', MODE_CATEGORY)
+    create_menu_item('Favourites', MODE_FAVOURITES)
+    create_menu_item('Search', MODE_SEARCH)
+    create_menu_item('Learn Something New', MODE_RANDOM)
 
     debug_log_duration("finished default mode")
 
@@ -274,7 +262,7 @@ elif mode[0] == MODE_FAVOURITES:
         li = xbmcgui.ListItem(favourite["title"], iconImage='DefaultFolder.png')
         li.addContextMenuItems([('Remove From Favourites',
                              'XBMC.RunScript(special://home/addons/plugin.video.pluralsight/resources/data/models/Favourites.py, %s, %s)'
-                             % (course["name"],database_path), True)])
+                             % (course["name"],database_path))], replaceItems=True)
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
 elif mode[0] == MODE_RANDOM:
