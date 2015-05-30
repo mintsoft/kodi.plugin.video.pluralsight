@@ -170,6 +170,14 @@ def create_menu_item(name, mode):
     li = xbmcgui.ListItem(name, iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
+def create_courses_view(courses):
+     for course in courses:
+        url = build_url({'mode': MODE_MODULES, 'course_id': course["id"], 'cached': 'true'})
+        li = xbmcgui.ListItem(course["title"], iconImage='DefaultFolder.png')
+        add_context_menu(li,course["name"],course["title"],database_path)
+        li.setInfo('video', {'plot': course["description"], 'genre': course["category_id"], 'title':course["title"]})
+        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+
 debug_log_duration("Pre-mode switch")
 if mode is None:
     debug_log("No mode, defaulting to main menu")
@@ -184,21 +192,11 @@ if mode is None:
     debug_log_duration("finished default mode")
 
 elif mode[0] == MODE_COURSES:
-    for course in catalog.courses:
-        url = build_url({'mode': MODE_MODULES, 'course_id': course["id"], 'cached': 'true'})
-        li = xbmcgui.ListItem(course["title"], iconImage='DefaultFolder.png')
-        add_context_menu(li,course["name"],course["title"],database_path)
-        li.setInfo('video', {'plot': course["description"], 'genre': course["category_id"], 'title':course["title"]})
-        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+    create_courses_view(catalog.courses)
     debug_log_duration("finished courses output")
 
 elif mode[0] == MODE_NEW_COURSES:
-    for course in catalog.new_courses:
-        url = build_url({'mode': MODE_MODULES, 'course_id': course["id"], 'cached': 'true'})
-        li = xbmcgui.ListItem(course["title"], iconImage='DefaultFolder.png')
-        add_context_menu(li,course["name"],course["title"],database_path)
-        li.setInfo('video', {'plot': course["description"], 'genre': course["category_id"], 'title':course["title"]})
-        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+    create_courses_view(catalog.new_courses)
     debug_log_duration("finished new courses output")
 
 elif mode[0] == MODE_MODULES:
