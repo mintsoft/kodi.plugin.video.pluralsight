@@ -241,12 +241,8 @@ elif mode[0] == MODE_SEARCH:
     criteria = dialog.input("Search Criteria", type=xbmcgui.INPUT_ALPHANUM)
     debug_log_duration("pre-searching for: " + criteria)
     results = search_for(criteria)
-    for course_name in results['Courses']:
-        course = catalog.get_course_by_name(course_name)
-        url = build_url({'mode': MODE_MODULES, 'course_id': course["id"], 'cached': 'true'})
-        li = xbmcgui.ListItem(course["title"], iconImage='DefaultFolder.png')
-        add_context_menu(li,course["name"],course["title"],database_path)
-        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+    courses = [catalog.get_course_by_name(x) for x in results['Courses']]
+    create_courses_view(courses)
     debug_log_duration("finished search output")
 
 elif mode[0] == MODE_FAVOURITES:
