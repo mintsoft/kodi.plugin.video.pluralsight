@@ -214,6 +214,7 @@ elif mode[0] == MODE_CATEGORY:
     for category in catalog.categories:
         url = build_url({'mode': MODE_COURSE_BY_CATEGORY, 'category_id': category["id"], 'cached': 'true'})
         li = xbmcgui.ListItem(category["name"], iconImage='DefaultFolder.png')
+        li.setInfo('video', {'title':category["name"]})
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
 elif mode[0] == MODE_COURSE_BY_CATEGORY:
