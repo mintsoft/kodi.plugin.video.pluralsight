@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f1acf36c-a014-4408-85ad-390d1b7cc41a" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Catalog.py" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Catalog.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugin.video.pluralsight/addon.py" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/addon.py" />
     </list>
     <ignored path="kodi.plugin.video.pluralsight.iws" />
@@ -32,8 +33,8 @@
       <file leaf-file-name="addon.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/addon.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.043869518" vertical-offset="3582" max-vertical-offset="4794">
-              <caret line="224" column="23" selection-start-line="224" selection-start-column="23" selection-end-line="224" selection-end-column="23" />
+            <state vertical-scroll-proportion="0.52418447" vertical-offset="2781" max-vertical-offset="5066">
+              <caret line="202" column="53" selection-start-line="202" selection-start-column="53" selection-end-line="202" selection-end-column="53" />
               <folding />
             </state>
           </provider>
@@ -42,8 +43,8 @@
       <file leaf-file-name="Catalog.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Catalog.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="214" max-vertical-offset="4590">
-              <caret line="30" column="8" selection-start-line="30" selection-start-column="8" selection-end-line="30" selection-end-column="8" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="3172" max-vertical-offset="4845">
+              <caret line="212" column="38" selection-start-line="212" selection-start-column="38" selection-end-line="212" selection-end-column="38" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
@@ -68,8 +69,8 @@
         <option value="$PROJECT_DIR$/plugin.video.pluralsight/resources/lib/requests/__init__.py" />
         <option value="$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Favrouties.py" />
         <option value="$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Favourites.py" />
-        <option value="$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Catalog.py" />
         <option value="$PROJECT_DIR$/plugin.video.pluralsight/addon.py" />
+        <option value="$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Catalog.py" />
       </list>
     </option>
   </component>
@@ -837,8 +838,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Catalog.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="214" max-vertical-offset="4590">
-          <caret line="30" column="8" selection-start-line="30" selection-start-column="8" selection-end-line="30" selection-end-column="8" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="3172" max-vertical-offset="4845">
+          <caret line="212" column="38" selection-start-line="212" selection-start-column="38" selection-end-line="212" selection-end-column="38" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
           </folding>
@@ -847,8 +848,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/addon.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.043869518" vertical-offset="3582" max-vertical-offset="4794">
-          <caret line="224" column="23" selection-start-line="224" selection-start-column="23" selection-end-line="224" selection-end-column="23" />
+        <state vertical-scroll-proportion="0.52418447" vertical-offset="2781" max-vertical-offset="5066">
+          <caret line="202" column="53" selection-start-line="202" selection-start-column="53" selection-end-line="202" selection-end-column="53" />
           <folding />
         </state>
       </provider>

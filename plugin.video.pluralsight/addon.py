@@ -24,6 +24,8 @@ MODE_CLIPS = 'clips'
 MODE_FAVOURITES = 'favourites'
 MODE_RANDOM = 'random'
 MODE_PLAY = 'play'
+MODE_AUTHORS = 'authors'
+MODE_COURSE_BY_AUTHOR = 'courses_by_author'
 
 DEBUG = False
 # endregion
@@ -186,6 +188,7 @@ if mode is None:
     create_menu_item('New Courses', MODE_NEW_COURSES)
     create_menu_item('Categories', MODE_CATEGORY)
     create_menu_item('Favourites', MODE_FAVOURITES)
+    create_menu_item('Authors', MODE_AUTHORS)
     create_menu_item('Search', MODE_SEARCH)
     create_menu_item('Learn Something New', MODE_RANDOM)
 
@@ -197,6 +200,19 @@ elif mode[0] == MODE_COURSES:
 
 elif mode[0] == MODE_NEW_COURSES:
     create_courses_view(catalog.new_courses)
+    debug_log_duration("finished new courses output")
+
+elif mode[0] == MODE_COURSE_BY_AUTHOR:
+    author_id = args.get('author_id',None)[0]
+    courses = catalog.get_course_by_author_id(author_id)
+    create_courses_view(courses)
+
+elif mode[0] == MODE_AUTHORS:
+    for author in catalog.authors:
+        url = build_url({'mode': MODE_COURSE_BY_AUTHOR, 'author_id': author["id"], 'cached': 'true'})
+        li = xbmcgui.ListItem(author["displayname"], iconImage='DefaultFolder.png')
+        li.setInfo('video', {'title':author["displayname"]})
+        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
     debug_log_duration("finished new courses output")
 
 elif mode[0] == MODE_MODULES:

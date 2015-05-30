@@ -185,6 +185,10 @@ class Catalog:
         return self.database.cursor().execute('SELECT * FROM course WHERE is_new = 1').fetchall()
 
     @property
+    def authors(self):
+        return self.database.cursor().execute('SELECT * FROM author').fetchall()
+
+    @property
     def categories(self):
         return self.database.cursor().execute('SELECT * FROM category').fetchall()
 
@@ -197,6 +201,17 @@ class Catalog:
 
     def get_course_by_id(self, id):
         return self.database.cursor().execute('SELECT * FROM course WHERE id=?', (id,)).fetchone()
+
+    def get_course_by_author_id(self,author_id):
+        return self.database.cursor().execute(
+            '''SELECT * FROM course
+                    INNER JOIN course_module
+                        ON course_module.course_id = course.id
+                    INNER JOIN module
+                        ON course_module.module_id = module.id
+                    WHERE module.author = ?
+                    GROUP BY course.id
+        ''', (author_id,)).fetchall()
 
     def get_module_by_id(self, id):
         return self.database.cursor().execute('SELECT * FROM module WHERE id=?', (id,)).fetchone()
