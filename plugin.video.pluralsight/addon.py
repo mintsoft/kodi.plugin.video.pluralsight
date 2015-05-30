@@ -15,6 +15,7 @@ start_time = time.time()
 
 # region Constants
 MODE_SEARCH = 'search'
+MODE_SEARCH_HISTORY = 'search_history'
 MODE_CATEGORY = 'category'
 MODE_COURSES = 'courses'
 MODE_NEW_COURSES = 'new_courses'
@@ -189,7 +190,7 @@ if mode is None:
     create_menu_item('Categories', MODE_CATEGORY)
     create_menu_item('Favourites', MODE_FAVOURITES)
     create_menu_item('Authors', MODE_AUTHORS)
-    create_menu_item('Search', MODE_SEARCH)
+    create_menu_item('Search', MODE_SEARCH_HISTORY)
     create_menu_item('Learn Something New', MODE_RANDOM)
 
     debug_log_duration("finished default mode")
@@ -253,11 +254,28 @@ elif mode[0] == MODE_CLIPS:
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li)
     debug_log_duration("finished clips output")
 
+elif mode[0] == MODE_SEARCH_HISTORY:
+    url = build_url({'mode': MODE_SEARCH, 'cached': 'true'})
+    li = xbmcgui.ListItem('New Search', iconImage='DefaultFolder.png')
+    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+
+    for search in catalog.search_history:
+        url = build_url({'mode': MODE_SEARCH, 'term':search['search_term'], 'cached': 'true'})
+        li = xbmcgui.ListItem(search['search_term'], iconImage='DefaultFolder.png')
+        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+
+
 elif mode[0] == MODE_SEARCH:
-    dialog = xbmcgui.Dialog()
-    criteria = dialog.input("Search Criteria", type=xbmcgui.INPUT_ALPHANUM)
-    debug_log_duration("pre-searching for: " + criteria)
-    results = search_for(criteria)
+    term = args.get('term',None)
+    if term is None:
+        dialog = xbmcgui.Dialog()
+        criteria = dialog.input("Search Criteria", type=xbmcgui.INPUT_ALPHANUM)
+        debug_log_duration("pre-searching for: " + criteria)
+        results = search_for(criteria)
+        catalog.save_search(criteria)
+    else:
+        results = search_for(term[0])
+
     courses = [catalog.get_course_by_name(x) for x in results['Courses']]
     create_courses_view(courses)
     debug_log_duration("finished search output")

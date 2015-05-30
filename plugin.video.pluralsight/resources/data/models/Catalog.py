@@ -100,6 +100,20 @@ class Catalog:
                     duration TEXT
                 ) ''')
             database.execute('''
+                CREATE TABLE search_history (
+                    id INTEGER PRIMARY KEY ASC,
+                    search_term TEXT
+                ) ''')
+            database.executescript('''
+                 CREATE TRIGGER ten_rows_only AFTER INSERT ON search_history
+                       BEGIN
+                         DELETE FROM search_history WHERE id <= (
+                                            SELECT id FROM search_history
+                                            ORDER BY id DESC
+                                            LIMIT 10, 1);
+                       END;
+                 ''')
+            database.execute('''
                 CREATE TABLE favourite (
                     course_name INT,
                     title TEXT
@@ -196,6 +210,10 @@ class Catalog:
     def favourites(self):
         return self.database.cursor().execute('SELECT * FROM favourite').fetchall()
 
+    @property
+    def search_history(self):
+        return self.database.cursor().execute('SELECT * FROM search_history ORDER BY id DESC').fetchall()
+
     def get_course_by_name(self, name):
         return self.database.cursor().execute('SELECT * FROM course WHERE name=?', (name,)).fetchone()
 
@@ -259,6 +277,10 @@ class Catalog:
 
     def get_courses_by_category_id(self, category_id):
         return self.database.cursor().execute('SELECT * FROM course WHERE category_id=? ORDER BY title asc', (category_id,)).fetchall()
+
+    def save_search(self,search_term):
+        self.database.execute('INSERT INTO search_history(search_term) VALUES(?)', (search_term,))
+        self.database.commit()
 
     def close_db(self):
         self.database.close()
