@@ -84,6 +84,32 @@ def add_context_menu(li,course_name,course_title, database_path):
                             ('Toggle watched', 'Action(ToggleWatched)')
                             ], replaceItems= True)
 
+def search_for(search_criteria):
+    search_safe = urllib.quote_plus(search_criteria)
+    search_url = "http://www.pluralsight.com/metadata/live/search?query=" + search_safe
+    search_headers = {
+        "Accept-Language": "en-us",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Accept-Encoding": "gzip"
+    }
+    debug_log("Hitting: " + search_url)
+    response = requests.get(search_url, headers=search_headers)
+    return response.json()
+
+def create_menu_item(name, mode):
+    url = build_url({'mode': mode, 'cached': 'true'})
+    li = xbmcgui.ListItem(name, iconImage='DefaultFolder.png')
+    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+
+def create_courses_view(courses):
+     for course in courses:
+        url = build_url({'mode': MODE_MODULES, 'course_id': course["id"], 'cached': 'true'})
+        li = xbmcgui.ListItem(course["title"], iconImage='DefaultFolder.png')
+        add_context_menu(li,course["name"],course["title"],database_path)
+        li.setInfo('video', {'plot': course["description"], 'genre': course["category_id"], 'title':course["title"]})
+        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+
 
 # endregion
 
@@ -151,34 +177,8 @@ else:
 debug_log_duration("catalog-loaded")
 mode = args.get('mode', None)
 
-
-def search_for(search_criteria):
-    search_safe = urllib.quote_plus(search_criteria)
-    search_url = "http://www.pluralsight.com/metadata/live/search?query=" + search_safe
-    search_headers = {
-        "Accept-Language": "en-us",
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "Accept-Encoding": "gzip"
-    }
-    debug_log("Hitting: " + search_url)
-    response = requests.get(search_url, headers=search_headers)
-    return response.json()
-
-def create_menu_item(name, mode):
-    url = build_url({'mode': mode, 'cached': 'true'})
-    li = xbmcgui.ListItem(name, iconImage='DefaultFolder.png')
-    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
-
-def create_courses_view(courses):
-     for course in courses:
-        url = build_url({'mode': MODE_MODULES, 'course_id': course["id"], 'cached': 'true'})
-        li = xbmcgui.ListItem(course["title"], iconImage='DefaultFolder.png')
-        add_context_menu(li,course["name"],course["title"],database_path)
-        li.setInfo('video', {'plot': course["description"], 'genre': course["category_id"], 'title':course["title"]})
-        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
-
 debug_log_duration("Pre-mode switch")
+
 if mode is None:
     debug_log("No mode, defaulting to main menu")
 
