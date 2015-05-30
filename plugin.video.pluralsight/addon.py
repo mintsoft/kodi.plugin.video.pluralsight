@@ -218,11 +218,7 @@ elif mode[0] == MODE_CATEGORY:
 
 elif mode[0] == MODE_COURSE_BY_CATEGORY:
     category_id = args.get('category_id', None)[0]
-    for course in catalog.get_courses_by_category_id(category_id):
-        url = build_url({'mode': MODE_MODULES, 'course_id': course["id"], 'cached': 'true'})
-        li = xbmcgui.ListItem(course["title"], iconImage='DefaultFolder.png')
-        add_context_menu(li,course["name"],course["title"],database_path)
-        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+    create_courses_view(catalog.get_courses_by_category_id(category_id))
 
 elif mode[0] == MODE_CLIPS:
     module_id = args.get('module_id', None)[0]

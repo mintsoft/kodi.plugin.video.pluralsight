@@ -32,8 +32,8 @@
       <file leaf-file-name="addon.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/addon.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.082114734" vertical-offset="2545" max-vertical-offset="4981">
-              <caret line="165" column="26" selection-start-line="165" selection-start-column="26" selection-end-line="165" selection-end-column="26" />
+            <state vertical-scroll-proportion="0.6175478" vertical-offset="3004" max-vertical-offset="4913">
+              <caret line="220" column="72" selection-start-line="220" selection-start-column="72" selection-end-line="220" selection-end-column="72" />
               <folding />
             </state>
           </provider>
@@ -847,8 +847,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/addon.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.082114734" vertical-offset="2545" max-vertical-offset="4981">
-          <caret line="165" column="26" selection-start-line="165" selection-start-column="26" selection-end-line="165" selection-end-column="26" />
+        <state vertical-scroll-proportion="0.6175478" vertical-offset="3004" max-vertical-offset="4913">
+          <caret line="220" column="72" selection-start-line="220" selection-start-column="72" selection-end-line="220" selection-end-column="72" />
           <folding />
         </state>
       </provider>
