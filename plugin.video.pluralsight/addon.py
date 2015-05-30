@@ -250,6 +250,7 @@ elif mode[0] == MODE_FAVOURITES:
         course = catalog.get_course_by_name(favourite["course_name"])
         url = build_url({'mode': MODE_MODULES, 'course_id':course["id"], 'cached': 'true'})
         li = xbmcgui.ListItem(favourite["title"], iconImage='DefaultFolder.png')
+        li.setInfo('video', {'plot': course["description"], 'genre': course["category_id"], 'title':course["title"]})
         li.addContextMenuItems([('Remove From Favourites',
                              'XBMC.RunScript(special://home/addons/plugin.video.pluralsight/resources/data/models/Favourites.py, %s, %s)'
                              % (course["name"],database_path))], replaceItems=True)
@@ -261,12 +262,7 @@ elif mode[0] == MODE_RANDOM:
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url1, listitem=li1, isFolder=True)
 
     course = catalog.get_random_course()
-    url = build_url({'mode': MODE_MODULES, 'course_id': course["id"], 'cached': 'true'})
-    li = xbmcgui.ListItem(course["title"], iconImage='DefaultFolder.png')
-    add_context_menu(li,course["name"],course["title"],database_path)
-    li.setInfo('video', {'plot': course["description"], 'genre': course["category_id"], 'title':course["title"]})
-    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
-
+    create_courses_view([course,])
 
 elif mode[0] == MODE_PLAY:
     module_name = args.get('module_name', None)[0]
