@@ -17,6 +17,7 @@ start_time = time.time()
 MODE_SEARCH = 'search'
 MODE_CATEGORY = 'category'
 MODE_COURSES = 'courses'
+MODE_NEW_COURSES = 'new_courses'
 MODE_MODULES = 'modules'
 MODE_COURSE_BY_CATEGORY = 'courses_by_category'
 MODE_CLIPS = 'clips'
@@ -172,6 +173,10 @@ if mode is None:
     li = xbmcgui.ListItem('Courses', iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
+    url = build_url({'mode': MODE_NEW_COURSES, 'cached': 'true'})
+    li = xbmcgui.ListItem('New Courses', iconImage='DefaultFolder.png')
+    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+
     url = build_url({'mode': MODE_CATEGORY, 'cached': 'true'})
     li = xbmcgui.ListItem('Categories', iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
@@ -198,6 +203,15 @@ elif mode[0] == MODE_COURSES:
         li.setInfo('video', {'plot': course["description"], 'genre': course["category_id"], 'title':course["title"]})
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
     debug_log_duration("finished courses output")
+
+elif mode[0] == MODE_NEW_COURSES:
+    for course in catalog.new_courses:
+        url = build_url({'mode': MODE_MODULES, 'course_id': course["id"], 'cached': 'true'})
+        li = xbmcgui.ListItem(course["title"], iconImage='DefaultFolder.png')
+        add_context_menu(li,course["name"],course["title"],database_path)
+        li.setInfo('video', {'plot': course["description"], 'genre': course["category_id"], 'title':course["title"]})
+        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+    debug_log_duration("finished new courses output")
 
 elif mode[0] == MODE_MODULES:
     course_id = args.get('course_id', None)[0]

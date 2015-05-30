@@ -181,6 +181,10 @@ class Catalog:
         return self.database.cursor().execute('SELECT * FROM course ORDER BY title asc').fetchall()
 
     @property
+    def new_courses(self):
+        return self.database.cursor().execute('SELECT * FROM course WHERE is_new = 1').fetchall()
+
+    @property
     def categories(self):
         return self.database.cursor().execute('SELECT * FROM category').fetchall()
 
