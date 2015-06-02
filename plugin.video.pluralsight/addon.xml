@@ -10,12 +10,12 @@
     <summary lang="en">Provides access to Pluralsight</summary>
     <description lang="en">Provides access to Pluralsight</description>
     <disclaimer lang="en"></disclaimer>
-    <language></language>
+    <language>en</language>
     <platform>all</platform>
     <license></license>
     <forum></forum>
     <website></website>
     <email></email>
-    <source></source>
+    <source>https://github.com/mintsoft/kodi.plugin.video.pluralsight</source>
   </extension>
 </addon>
