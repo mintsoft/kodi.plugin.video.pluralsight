@@ -80,12 +80,12 @@ def get_video_url(video_url, token):
         raise AuthorisationError
     return response.json()["VideoUrl"]
 
-def add_context_menu(li,course_name,course_title, database_path):
+def add_context_menu(li,course_name,course_title, database_path, replace = True):
     li.addContextMenuItems([('Add to Favourite Courses',
                              'XBMC.RunScript(special://home/addons/plugin.video.pluralsight/resources/data/models/Favourites.py, %s, %s, %s)'
                              % (course_name, course_title.replace(",",""),database_path)),
                             ('Toggle watched', 'Action(ToggleWatched)')
-                            ], replaceItems= True)
+                            ], replaceItems= replace)
 
 def search_for(search_criteria):
     search_safe = urllib.quote_plus(search_criteria)
@@ -250,7 +250,7 @@ elif mode[0] == MODE_CLIPS:
         li = xbmcgui.ListItem(clip.title, iconImage='DefaultVideo.png')
         li.addStreamInfo('video', {'width': 1024, 'height': 768, 'duration': clip.duration})
         li.setProperty('IsPlayable', 'true')
-        add_context_menu(li,course["name"],course["title"],database_path)
+        add_context_menu(li,course["name"],course["title"],database_path,False)
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li)
     debug_log_duration("finished clips output")
 
