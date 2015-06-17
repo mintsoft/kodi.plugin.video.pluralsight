@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f1acf36c-a014-4408-85ad-390d1b7cc41a" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugin.video.pluralsight.zip" afterPath="$PROJECT_DIR$/plugin.video.pluralsight.zip" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Catalog.py" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Catalog.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugin.video.pluralsight/addon.py" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/addon.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
@@ -34,8 +34,8 @@
       <file leaf-file-name="addon.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/addon.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.48368955" vertical-offset="3854" max-vertical-offset="5559">
-              <caret line="252" column="78" selection-start-line="252" selection-start-column="78" selection-end-line="252" selection-end-column="78" />
+            <state vertical-scroll-proportion="-0.54893136" vertical-offset="3446" max-vertical-offset="5559">
+              <caret line="174" column="51" selection-start-line="174" selection-start-column="51" selection-end-line="174" selection-end-column="51" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -46,8 +46,8 @@
       <file leaf-file-name="Catalog.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Catalog.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="148" max-vertical-offset="5219">
-              <caret line="19" column="26" selection-start-line="19" selection-start-column="26" selection-end-line="19" selection-end-column="26" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="214" max-vertical-offset="5355">
+              <caret line="34" column="26" selection-start-line="34" selection-start-column="26" selection-end-line="34" selection-end-column="26" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
@@ -406,6 +406,7 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -865,8 +866,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Catalog.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="148" max-vertical-offset="5219">
-          <caret line="19" column="26" selection-start-line="19" selection-start-column="26" selection-end-line="19" selection-end-column="26" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="214" max-vertical-offset="5355">
+          <caret line="34" column="26" selection-start-line="34" selection-start-column="26" selection-end-line="34" selection-end-column="26" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
           </folding>
@@ -875,8 +876,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/addon.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.48368955" vertical-offset="3854" max-vertical-offset="5559">
-          <caret line="252" column="78" selection-start-line="252" selection-start-column="78" selection-end-line="252" selection-end-column="78" />
+        <state vertical-scroll-proportion="-0.54893136" vertical-offset="3446" max-vertical-offset="5559">
+          <caret line="174" column="51" selection-start-line="174" selection-start-column="51" selection-end-line="174" selection-end-column="51" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>

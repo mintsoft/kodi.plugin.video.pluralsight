@@ -246,7 +246,7 @@ elif mode[0] == MODE_CLIPS:
     module = catalog.get_module_by_id(module_id)
 
     for clip in catalog.get_clips_by_module_id(module_id,course_id):
-        url = build_url({'mode': MODE_PLAY, 'clip_title': clip.title ,'module_name': module["name"], 'course_name': course["name"], 'cached': 'true'})
+        url = build_url({'mode': MODE_PLAY, 'clip_id': clip.index,'module_name': module["name"], 'course_name': course["name"], 'cached': 'true'})
         li = xbmcgui.ListItem(clip.title, iconImage='DefaultVideo.png')
         li.addStreamInfo('video', {'width': 1024, 'height': 768, 'duration': clip.duration})
         li.setProperty('IsPlayable', 'true')
@@ -302,9 +302,9 @@ elif mode[0] == MODE_RANDOM:
 elif mode[0] == MODE_PLAY:
     module_name = args.get('module_name', None)[0]
     course_name = args.get('course_name', None)[0]
-    clip_title = args.get('clip_title', None)[0]
+    clip_id = args.get('clip_id', None)[0]
 
-    clip = catalog.get_clip_by_title(clip_title, module_name, course_name)
+    clip = catalog.get_clip_by_id(clip_id, module_name, course_name)
     url = clip.get_url(username)
     try:
         video_url = get_video_url(url, catalog.token)
@@ -313,7 +313,7 @@ elif mode[0] == MODE_PLAY:
         token = login(catalog)
         video_url = get_video_url(url, token)
 
-    li = xbmcgui.ListItem(label=clip_title, path=video_url)
+    li = xbmcgui.ListItem(path=video_url)
     xbmcplugin.setResolvedUrl(handle=addon_handle, succeeded=True, listitem=li)
 
 catalog.close_db()

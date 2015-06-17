@@ -155,9 +155,8 @@ class Catalog:
                                            (module_index,int(module["Author"]), module["Name"], module["Title"], module["Duration"]))
 
             for clip_index, clip in enumerate(module["Clips"]):
-                san_clip = filter(lambda x: x in string.printable, clip["Title"])
                 self.database.execute('INSERT INTO clip (id, module_id, title, duration) VALUES(?,?,?,?)',
-                                      (clip_index, module_index, san_clip, clip["Duration"]))
+                                      (clip_index, module_index, clip["Title"], clip["Duration"]))
 
         for course_index, course in enumerate(raw_courses):
             self.database.execute(
@@ -261,6 +260,15 @@ class Catalog:
         raw_author = self.database.cursor().execute('SELECT * FROM author WHERE id=?', (raw_module["author"],)).fetchone()
 
         clip = self.database.cursor().execute('SELECT * FROM clip WHERE module_id=? and title=?', (raw_module["id"],title,)).fetchone()
+
+        return Clip(clip["title"], clip["duration"] ,clip["id"], raw_course["name"] ,raw_author["handle"], raw_module["name"])
+
+    def get_clip_by_id(self,id,module_name,course_name):
+        raw_course = self.database.cursor().execute('SELECT * FROM course WHERE name=?', (course_name,)).fetchone()
+        raw_module = self.database.cursor().execute('SELECT * FROM module WHERE name=?', (module_name,)).fetchone()
+        raw_author = self.database.cursor().execute('SELECT * FROM author WHERE id=?', (raw_module["author"],)).fetchone()
+
+        clip = self.database.cursor().execute('SELECT * FROM clip WHERE module_id=? and id=?', (raw_module["id"],id,)).fetchone()
 
         return Clip(clip["title"], clip["duration"] ,clip["id"], raw_course["name"] ,raw_author["handle"], raw_module["name"])
 
