@@ -25,8 +25,6 @@ MODE_RANDOM = 'random'
 MODE_PLAY = 'play'
 MODE_AUTHORS = 'authors'
 MODE_COURSE_BY_AUTHOR = 'courses_by_author'
-
-DEBUG = False
 # endregion
 # region Exceptions
 class AuthorisationError(Exception):
@@ -35,7 +33,7 @@ class AuthorisationError(Exception):
 # region Global Functions
 
 def kodi_init():
-    global base_url, addon_handle, args
+    global g_base_url, g_addon_handle, g_args
     __settings__ = xbmcaddon.Addon()
     root_dir = __settings__.getAddonInfo('path')
     if root_dir[-1] == ';':
@@ -43,24 +41,23 @@ def kodi_init():
     root_dir = xbmc.translatePath(root_dir)
     lib_dir = xbmc.translatePath(os.path.join(root_dir, 'resources', 'lib'))
     sys.path.append(lib_dir)
-    base_url = sys.argv[0]
-    addon_handle = int(sys.argv[1])
-    args = urlparse.parse_qs(sys.argv[2][1:])
-
+    g_base_url = sys.argv[0]
+    g_addon_handle = int(sys.argv[1])
+    g_args = urlparse.parse_qs(sys.argv[2][1:])
 
 def debug_log_duration(name):
     duration = time.time() - start_time
     xbmc.log("PluralSight Duration@" + name + " : " + str(duration), xbmc.LOGNOTICE)
 
 def build_url(query):
-    return base_url + '?' + urllib.urlencode(query)
+    return g_base_url + '?' + urllib.urlencode(query)
 
 def credentials_are_valid():
     credentials_dialog = xbmcgui.Dialog()
-    if username == "" or password == "":
+    if g_username == "" or g_password == "":
         credentials_dialog.ok("Credentials Error", "Username or password are empty, please configure these in the settings")
         return False
-    elif "@" in username:
+    elif "@" in g_username:
         credentials_dialog.ok("Login Error",
                   "You appear be attempting to use an email address to login\n\nPluralsight requires the username instead, please change this in the settings")
         return False
@@ -69,8 +66,8 @@ def credentials_are_valid():
 def login(login_catalog):
     debug_log_duration("Starting login")
     login_headers = {"Content-Type": "application/x-www-form-urlencoded"}
-    payload = {"Password": password}
-    login_url = "https://www.pluralsight.com/metadata/live/users/" + username + "/login"
+    payload = {"Password": g_password}
+    login_url = "https://www.pluralsight.com/metadata/live/users/" + g_username + "/login"
     debug_log_duration("Using url: " + login_url)
     response = requests.post(login_url, data=payload, headers=login_headers)
     debug_log_duration("Completed login, Response Code:" + str(response.status_code))
@@ -109,7 +106,7 @@ def search_for(search_criteria):
 def create_menu_item(name, mode):
     menu_url = build_url({'mode': mode, 'cached': 'true'})
     menu_li = xbmcgui.ListItem(name, iconImage='DefaultFolder.png')
-    xbmcplugin.addDirectoryItem(handle=addon_handle, url=menu_url, listitem=menu_li, isFolder=True)
+    xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=menu_url, listitem=menu_li, isFolder=True)
 # endregion
 # region View Rendering
 def default_view():
@@ -123,45 +120,40 @@ def default_view():
     create_menu_item('Learn Something New', MODE_RANDOM)
     debug_log_duration("finished default mode")
 
-def author_view():
-    global url, li
+def author_view(catalogue):
     for author in catalogue.authors:
         url = build_url({'mode': MODE_COURSE_BY_AUTHOR, 'author_id': author["id"], 'cached': 'true'})
         li = xbmcgui.ListItem(author["displayname"], iconImage='DefaultFolder.png')
         li.setInfo('video', {'title': author["displayname"]})
-        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+        xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=url, listitem=li, isFolder=True)
     debug_log_duration("finished new courses output")
 
-def course_by_author_view():
-    global courses
-    author_id = args.get('author_id', None)[0]
+def course_by_author_view(catalogue):
+    author_id = g_args.get('author_id', None)[0]
     courses = catalogue.get_course_by_author_id(author_id)
     courses_view(courses)
 
-def module_view():
-    global course_id, course, module, url, li
-    course_id = args.get('course_id', None)[0]
+def module_view(catalogue):
+    course_id = g_args.get('course_id', None)[0]
     course = catalogue.get_course_by_id(course_id)
     modules = catalogue.get_modules_by_course_id(course_id)
     for module in modules:
         url = build_url({'mode': MODE_CLIPS, 'course_id': course_id, 'module_id': module["id"], 'cached': 'true'})
         li = xbmcgui.ListItem(module["title"], iconImage='DefaultFolder.png')
         add_context_menu(li, course["name"], course["title"], database_path)
-        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+        xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=url, listitem=li, isFolder=True)
     debug_log_duration("finished modules output")
 
-def category_view():
-    global url, li
+def category_view(catalogue):
     for category in catalogue.categories:
         url = build_url({'mode': MODE_COURSE_BY_CATEGORY, 'category_id': category["id"], 'cached': 'true'})
         li = xbmcgui.ListItem(category["name"], iconImage='DefaultFolder.png')
         li.setInfo('video', {'title': category["name"]})
-        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+        xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=url, listitem=li, isFolder=True)
 
-def clip_view():
-    global course_id, course, module, clip, url, li
-    module_id = args.get('module_id', None)[0]
-    course_id = args.get('course_id', None)[0]
+def clip_view(catalogue):
+    module_id = g_args.get('module_id', None)[0]
+    course_id = g_args.get('course_id', None)[0]
     course = catalogue.get_course_by_id(course_id)
     module = catalogue.get_module_by_id(module_id)
     for clip in catalogue.get_clips_by_module_id(module_id, course_id):
@@ -172,22 +164,20 @@ def clip_view():
         li.addStreamInfo('video', {'width': 1024, 'height': 768, 'duration': clip.duration})
         li.setProperty('IsPlayable', 'true')
         add_context_menu(li, course["name"], course["title"], database_path, False)
-        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li)
+        xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=url, listitem=li)
     debug_log_duration("finished clips output")
 
-def search_history_view():
-    global url, li
+def search_history_view(catalogue):
     url = build_url({'mode': MODE_SEARCH, 'cached': 'true'})
     li = xbmcgui.ListItem('New Search', iconImage='DefaultFolder.png')
-    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+    xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=url, listitem=li, isFolder=True)
     for search in catalogue.search_history:
         url = build_url({'mode': MODE_SEARCH, 'term': search['search_term'], 'cached': 'true'})
         li = xbmcgui.ListItem(search['search_term'], iconImage='DefaultFolder.png')
-        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+        xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=url, listitem=li, isFolder=True)
 
-def search_view():
-    global courses
-    term = args.get('term', None)
+def search_view(catalogue):
+    term = g_args.get('term', None)
     if term is None:
         dialog = xbmcgui.Dialog()
         criteria = dialog.input("Search Criteria", type=xbmcgui.INPUT_ALPHANUM)
@@ -200,8 +190,7 @@ def search_view():
     courses_view(courses)
     debug_log_duration("finished search output")
 
-def favourites_view():
-    global course, url, li
+def favourites_view(catalogue):
     for favourite in catalogue.favourites:
         course = catalogue.get_course_by_name(favourite["course_name"])
         url = build_url({'mode': MODE_MODULES, 'course_id': course["id"], 'cached': 'true'})
@@ -211,23 +200,21 @@ def favourites_view():
         li.addContextMenuItems([('Remove From Favourites',
                                  'XBMC.RunScript(special://home/addons/plugin.video.pluralsight/resources/data/models/Favourites.py, %s, %s)'
                                  % (course["name"], database_path))], replaceItems=True)
-        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+        xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=url, listitem=li, isFolder=True)
 
-def random_view():
-    global course
+def random_view(catalogue):
     url1 = build_url({'mode': MODE_RANDOM, 'cached': 'true'})
     li1 = xbmcgui.ListItem('Pick a Different Course', iconImage='DefaultFolder.png')
-    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url1, listitem=li1, isFolder=True)
+    xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=url1, listitem=li1, isFolder=True)
     course = catalogue.get_random_course()
     courses_view([course, ])
 
-def play_view():
-    global clip, url, li
-    module_name = args.get('module_name', None)[0]
-    course_name = args.get('course_name', None)[0]
-    clip_id = args.get('clip_id', None)[0]
+def play_view(catalogue):
+    module_name = g_args.get('module_name', None)[0]
+    course_name = g_args.get('course_name', None)[0]
+    clip_id = g_args.get('clip_id', None)[0]
     clip = catalogue.get_clip_by_id(clip_id, module_name, course_name)
-    url = clip.get_url(username)
+    url = clip.get_url(g_username)
     try:
         video_url = get_video_url(url, catalogue.token)
     except AuthorisationError:
@@ -235,7 +222,7 @@ def play_view():
         token = login(catalogue)
         video_url = get_video_url(url, token)
     li = xbmcgui.ListItem(path=video_url)
-    xbmcplugin.setResolvedUrl(handle=addon_handle, succeeded=True, listitem=li)
+    xbmcplugin.setResolvedUrl(handle=g_addon_handle, succeeded=True, listitem=li)
 
 def courses_view(courses):
      for this_course in courses:
@@ -243,32 +230,31 @@ def courses_view(courses):
         course_view_li = xbmcgui.ListItem(this_course["title"], iconImage='DefaultFolder.png')
         add_context_menu(course_view_li,this_course["name"],this_course["title"],database_path)
         course_view_li.setInfo('video', {'plot': this_course["description"], 'genre': this_course["category_id"], 'title':this_course["title"]})
-        xbmcplugin.addDirectoryItem(handle=addon_handle, url=course_view_url, listitem=course_view_li, isFolder=True)
+        xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=course_view_url, listitem=course_view_li, isFolder=True)
 
 # endregion
 
 def main():
-    global base_url, addon_handle, args, database_path, username, password, catalogue
+    global g_base_url, g_addon_handle, g_args, g_database_path, g_username, g_password
 
     kodi_init()
 
-    debug_log_duration("PostKodiSetup")
+    debug_log_duration("PostKodiInit")
 
-    temp_path = xbmc.translatePath("special://temp/")
-    database_path = os.path.join(temp_path, 'pluralsight_catalogue.db')
-    xbmcplugin.setContent(addon_handle, 'movies')
-    xbmcplugin.addSortMethod(addon_handle, xbmcplugin.SORT_METHOD_TITLE)
-    username = xbmcplugin.getSetting(addon_handle, "username")
-    password = xbmcplugin.getSetting(addon_handle, "password")
+    g_database_path = os.path.join(xbmc.translatePath("special://temp/"), 'pluralsight_catalogue.db')
+    xbmcplugin.setContent(g_addon_handle, 'movies')
+    xbmcplugin.addSortMethod(g_addon_handle, xbmcplugin.SORT_METHOD_TITLE)
+    g_username = xbmcplugin.getSetting(g_addon_handle, "username")
+    g_password = xbmcplugin.getSetting(g_addon_handle, "password")
 
-    debug_log_duration("PreMain")
+    debug_log_duration("PostSettingsLoad")
 
     if not credentials_are_valid():
-        xbmcplugin.endOfDirectory(addon_handle)
-    cached = args.get('cached', None)
-    debug_log_duration("pre-cache")
-    if cached is None and DEBUG is not True:
-        catalogue = Catalogue.Catalogue(database_path)
+        xbmcplugin.endOfDirectory(g_addon_handle)
+    cached = g_args.get('cached', None)
+    debug_log_duration("pre-cache check")
+    if cached is None:
+        catalogue = Catalogue.Catalogue(g_database_path)
 
         cache_headers = {
             "Accept-Language": "en-us",
@@ -278,68 +264,56 @@ def main():
             "If-None-Match": catalogue.etag
         }
 
-        debug_log_duration("pre-get")
+        debug_log_duration("pre-API-get")
         r = requests.get("http://www.pluralsight.com/metadata/live/courses/", headers=cache_headers)
-        debug_log_duration("post-get")
+        debug_log_duration("post-API-get")
 
         if r.status_code == 304:
-            debug_log_duration("Loading from cache as it has not modified")
+            debug_log_duration("Loading from cache as it has not modified (fast-path)")
         else:
-            debug_log_duration("Re-priming from the response")
+            debug_log_duration("Re-priming DB from the API response (slow-path)")
             catalogue.update(r.headers["ETag"], r.json())
 
     else:
-        catalogue = Catalogue.Catalogue(database_path)
+        catalogue = Catalogue.Catalogue(g_database_path)
     debug_log_duration("catalogue-loaded")
-    mode = args.get('mode', None)
+    mode = g_args.get('mode', None)
     debug_log_duration("Pre-mode switch")
 
-    if mode is None:
-        default_view()
-
-    elif mode[0] == MODE_COURSES:
+    if mode[0] == MODE_COURSES:
         courses_view(catalogue.courses)
         debug_log_duration("finished courses output")
-
     elif mode[0] == MODE_NEW_COURSES:
         courses_view(catalogue.new_courses)
         debug_log_duration("finished new courses output")
-
     elif mode[0] == MODE_COURSE_BY_AUTHOR:
-        course_by_author_view()
-
+        course_by_author_view(catalogue)
     elif mode[0] == MODE_AUTHORS:
-        author_view()
-
+        author_view(catalogue)
     elif mode[0] == MODE_MODULES:
-        module_view()
-
+        module_view(catalogue)
     elif mode[0] == MODE_CATEGORY:
-        category_view()
-
+        category_view(catalogue)
     elif mode[0] == MODE_COURSE_BY_CATEGORY:
-        category_id = args.get('category_id', None)[0]
+        category_id = g_args.get('category_id', None)[0]
         courses_view(catalogue.get_courses_by_category_id(category_id))
-
     elif mode[0] == MODE_CLIPS:
-        clip_view()
-
+        clip_view(catalogue)
     elif mode[0] == MODE_SEARCH_HISTORY:
-        search_history_view()
-
+        search_history_view(catalogue)
     elif mode[0] == MODE_SEARCH:
-        search_view()
-
+        search_view(catalogue)
     elif mode[0] == MODE_FAVOURITES:
-        favourites_view()
-
+        favourites_view(catalogue)
     elif mode[0] == MODE_RANDOM:
-        random_view()
-
+        random_view(catalogue)
     elif mode[0] == MODE_PLAY:
-        play_view()
+        play_view(catalogue)
+    else:
+        default_view()
+
     catalogue.close_db()
-    xbmcplugin.endOfDirectory(addon_handle)
+    xbmcplugin.endOfDirectory(g_addon_handle)
 
 start_time = time.time()
 main()
