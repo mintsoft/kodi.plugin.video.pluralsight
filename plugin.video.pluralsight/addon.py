@@ -255,8 +255,7 @@ def main():
     debug_log_duration("PostKodiSetup")
 
     temp_path = xbmc.translatePath("special://temp/")
-    etag_path = os.path.join(temp_path, "pluralsight_etag.pkl")
-    database_path = os.path.join(temp_path, 'pluralsight_catalog.db')
+    database_path = os.path.join(temp_path, 'pluralsight_catalogue.db')
     xbmcplugin.setContent(addon_handle, 'movies')
     xbmcplugin.addSortMethod(addon_handle, xbmcplugin.SORT_METHOD_TITLE)
     username = xbmcplugin.getSetting(addon_handle, "username")
