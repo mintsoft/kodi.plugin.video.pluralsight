@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f1acf36c-a014-4408-85ad-390d1b7cc41a" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Favourites.py" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Favourites.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugin.video.pluralsight.zip" afterPath="$PROJECT_DIR$/plugin.video.pluralsight.zip" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugin.video.pluralsight/addon.py" afterPath="$PROJECT_DIR$/plugin.video.pluralsight/addon.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="kodi.plugin.video.pluralsight.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -30,10 +31,24 @@
       <file leaf-file-name="addon.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/addon.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-7.9019265">
-              <caret line="26" column="43" selection-start-line="26" selection-start-column="43" selection-end-line="26" selection-end-column="43" />
+            <state vertical-scroll-proportion="0.42619926">
+              <caret line="285" column="35" selection-start-line="285" selection-start-column="35" selection-end-line="285" selection-end-column="35" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
+                <element signature="e#833#1287#0" expanded="false" />
+                <element signature="e#1323#1445#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Catalogue.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Catalogue.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-164.33333">
+              <caret line="297" column="36" selection-start-line="297" selection-start-column="36" selection-end-line="297" selection-end-column="36" />
+              <folding>
+                <element signature="e#0#14#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -421,16 +436,6 @@
           <line>34</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/plugin.video.pluralsight/addon.py</url>
-          <line>29</line>
-          <option name="timeStamp" value="4" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/plugin.video.pluralsight/addon.py</url>
-          <line>14</line>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
       </breakpoints>
       <option name="time" value="6" />
     </breakpoint-manager>
@@ -453,6 +458,8 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#833#1287#0" expanded="false" />
+            <element signature="e#1323#1445#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -480,6 +487,8 @@
           <caret line="212" column="56" selection-start-line="212" selection-start-column="56" selection-end-line="212" selection-end-column="56" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#833#1287#0" expanded="false" />
+            <element signature="e#1323#1445#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -500,6 +509,8 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#833#1287#0" expanded="false" />
+            <element signature="e#1323#1445#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -520,6 +531,8 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#833#1287#0" expanded="false" />
+            <element signature="e#1323#1445#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -540,6 +553,8 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#833#1287#0" expanded="false" />
+            <element signature="e#1323#1445#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -560,6 +575,8 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#833#1287#0" expanded="false" />
+            <element signature="e#1323#1445#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -580,6 +597,8 @@
           <caret line="109" column="44" selection-start-line="109" selection-start-column="44" selection-end-line="109" selection-end-column="44" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#833#1287#0" expanded="false" />
+            <element signature="e#1323#1445#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -608,6 +627,8 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#833#1287#0" expanded="false" />
+            <element signature="e#1323#1445#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -628,6 +649,8 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#833#1287#0" expanded="false" />
+            <element signature="e#1323#1445#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -648,6 +671,8 @@
           <caret line="27" column="48" selection-start-line="27" selection-start-column="48" selection-end-line="27" selection-end-column="48" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#833#1287#0" expanded="false" />
+            <element signature="e#1323#1445#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -676,6 +701,8 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#833#1287#0" expanded="false" />
+            <element signature="e#1323#1445#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -702,6 +729,8 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#833#1287#0" expanded="false" />
+            <element signature="e#1323#1445#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -728,6 +757,8 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#833#1287#0" expanded="false" />
+            <element signature="e#1323#1445#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -746,6 +777,8 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#833#1287#0" expanded="false" />
+            <element signature="e#1323#1445#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -857,30 +890,32 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Favourites.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.35726795">
+          <caret line="14" column="67" selection-start-line="14" selection-start-column="67" selection-end-line="14" selection-end-column="67" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Catalogue.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-4.4469786">
-          <caret line="34" column="26" selection-start-line="34" selection-start-column="26" selection-end-line="34" selection-end-column="26" />
+        <state vertical-scroll-proportion="-164.33333">
+          <caret line="297" column="36" selection-start-line="297" selection-start-column="36" selection-end-line="297" selection-end-column="36" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/resources/data/models/Favourites.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.17056856">
-          <caret line="8" column="65" selection-start-line="8" selection-start-column="65" selection-end-line="8" selection-end-column="65" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/plugin.video.pluralsight/addon.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-7.9019265">
-          <caret line="26" column="43" selection-start-line="26" selection-start-column="43" selection-end-line="26" selection-end-column="43" />
+        <state vertical-scroll-proportion="0.42619926">
+          <caret line="285" column="35" selection-start-line="285" selection-start-column="35" selection-end-line="285" selection-end-column="35" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#833#1287#0" expanded="false" />
+            <element signature="e#1323#1445#0" expanded="false" />
           </folding>
         </state>
       </provider>

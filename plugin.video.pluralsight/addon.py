@@ -46,7 +46,7 @@ def kodi_init():
     g_args = urlparse.parse_qs(sys.argv[2][1:])
 
 def debug_log_duration(name):
-    duration = time.time() - start_time
+    duration = time.time() - g_start_time
     xbmc.log("PluralSight Duration@" + name + " : " + str(duration), xbmc.LOGNOTICE)
 
 def build_url(query):
@@ -134,13 +134,14 @@ def course_by_author_view(catalogue):
     courses_view(courses)
 
 def module_view(catalogue):
+    global g_database_path
     course_id = g_args.get('course_id', None)[0]
     course = catalogue.get_course_by_id(course_id)
     modules = catalogue.get_modules_by_course_id(course_id)
     for module in modules:
         url = build_url({'mode': MODE_CLIPS, 'course_id': course_id, 'module_id': module["id"], 'cached': 'true'})
         li = xbmcgui.ListItem(module["title"], iconImage='DefaultFolder.png')
-        add_context_menu(li, course["name"], course["title"], database_path)
+        add_context_menu(li, course["name"], course["title"], g_database_path)
         xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=url, listitem=li, isFolder=True)
     debug_log_duration("finished modules output")
 
@@ -152,6 +153,7 @@ def category_view(catalogue):
         xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=url, listitem=li, isFolder=True)
 
 def clip_view(catalogue):
+    global g_database_path
     module_id = g_args.get('module_id', None)[0]
     course_id = g_args.get('course_id', None)[0]
     course = catalogue.get_course_by_id(course_id)
@@ -163,7 +165,7 @@ def clip_view(catalogue):
         li = xbmcgui.ListItem(clip.title, iconImage='DefaultVideo.png')
         li.addStreamInfo('video', {'width': 1024, 'height': 768, 'duration': clip.duration})
         li.setProperty('IsPlayable', 'true')
-        add_context_menu(li, course["name"], course["title"], database_path, False)
+        add_context_menu(li, course["name"], course["title"], g_database_path, False)
         xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=url, listitem=li)
     debug_log_duration("finished clips output")
 
@@ -191,6 +193,7 @@ def search_view(catalogue):
     debug_log_duration("finished search output")
 
 def favourites_view(catalogue):
+    global g_database_path
     for favourite in catalogue.favourites:
         course = catalogue.get_course_by_name(favourite["course_name"])
         url = build_url({'mode': MODE_MODULES, 'course_id': course["id"], 'cached': 'true'})
@@ -199,7 +202,7 @@ def favourites_view(catalogue):
                    {'plot': course["description"], 'genre': course["category_id"], 'title': course["title"]})
         li.addContextMenuItems([('Remove From Favourites',
                                  'XBMC.RunScript(special://home/addons/plugin.video.pluralsight/resources/data/models/Favourites.py, %s, %s)'
-                                 % (course["name"], database_path))], replaceItems=True)
+                                 % (course["name"], g_database_path))], replaceItems=True)
         xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=url, listitem=li, isFolder=True)
 
 def random_view(catalogue):
@@ -225,10 +228,11 @@ def play_view(catalogue):
     xbmcplugin.setResolvedUrl(handle=g_addon_handle, succeeded=True, listitem=li)
 
 def courses_view(courses):
+    global g_database_path
     for this_course in courses:
         course_view_url = build_url({'mode': MODE_MODULES, 'course_id': this_course["id"], 'cached': 'true'})
         course_view_li = xbmcgui.ListItem(this_course["title"], iconImage='DefaultFolder.png')
-        add_context_menu(course_view_li,this_course["name"],this_course["title"],database_path)
+        add_context_menu(course_view_li,this_course["name"],this_course["title"],g_database_path)
         course_view_li.setInfo('video', {'plot': this_course["description"], 'genre': this_course["category_id"], 'title':this_course["title"]})
         xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=course_view_url, listitem=course_view_li, isFolder=True)
     debug_log_duration("Finished courses output")
@@ -315,5 +319,5 @@ def main():
     catalogue.close_db()
     xbmcplugin.endOfDirectory(g_addon_handle)
 
-start_time = time.time()
+g_start_time = time.time()
 main()
