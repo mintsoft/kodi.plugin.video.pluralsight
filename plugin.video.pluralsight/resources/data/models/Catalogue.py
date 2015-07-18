@@ -43,7 +43,7 @@ class Clip:
                                      moduleName=self.module_name, clipIndex=self.index)
 
 
-class Catalog:
+class Catalogue:
     def __init__(self, database_path):
         if not os.path.exists(database_path):
             database = sqlite3.connect(database_path)
