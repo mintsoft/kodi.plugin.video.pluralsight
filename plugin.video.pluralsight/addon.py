@@ -225,12 +225,13 @@ def play_view(catalogue):
     xbmcplugin.setResolvedUrl(handle=g_addon_handle, succeeded=True, listitem=li)
 
 def courses_view(courses):
-     for this_course in courses:
+    for this_course in courses:
         course_view_url = build_url({'mode': MODE_MODULES, 'course_id': this_course["id"], 'cached': 'true'})
         course_view_li = xbmcgui.ListItem(this_course["title"], iconImage='DefaultFolder.png')
         add_context_menu(course_view_li,this_course["name"],this_course["title"],database_path)
         course_view_li.setInfo('video', {'plot': this_course["description"], 'genre': this_course["category_id"], 'title':this_course["title"]})
         xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=course_view_url, listitem=course_view_li, isFolder=True)
+    debug_log_duration("Finished courses output")
 
 # endregion
 
@@ -276,16 +277,16 @@ def main():
 
     else:
         catalogue = Catalogue.Catalogue(g_database_path)
+
     debug_log_duration("catalogue-loaded")
     mode = g_args.get('mode', None)
-    debug_log_duration("Pre-mode switch")
 
-    if mode[0] == MODE_COURSES:
+    if mode is None:
+        default_view()
+    elif mode[0] == MODE_COURSES:
         courses_view(catalogue.courses)
-        debug_log_duration("finished courses output")
     elif mode[0] == MODE_NEW_COURSES:
         courses_view(catalogue.new_courses)
-        debug_log_duration("finished new courses output")
     elif mode[0] == MODE_COURSE_BY_AUTHOR:
         course_by_author_view(catalogue)
     elif mode[0] == MODE_AUTHORS:
@@ -309,9 +310,8 @@ def main():
         random_view(catalogue)
     elif mode[0] == MODE_PLAY:
         play_view(catalogue)
-    else:
-        default_view()
 
+    debug_log_duration("closing catalogue")
     catalogue.close_db()
     xbmcplugin.endOfDirectory(g_addon_handle)
 
