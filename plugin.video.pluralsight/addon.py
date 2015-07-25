@@ -55,11 +55,10 @@ def build_url(query):
 def credentials_are_valid():
     credentials_dialog = xbmcgui.Dialog()
     if g_username == "" or g_password == "":
-        credentials_dialog.ok("Credentials Error", "Username or password are empty, please configure these in the settings")
+        credentials_dialog.ok(xbmcaddon.getLocalizedString(30021), xbmcaddon.getLocalizedString(30022))
         return False
     elif "@" in g_username:
-        credentials_dialog.ok("Login Error",
-                  "You appear be attempting to use an email address to login\n\nPluralsight requires the username instead, please change this in the settings")
+        credentials_dialog.ok(xbmcaddon.getLocalizedString(30023), xbmcaddon.getLocalizedString(30024))
         return False
     return True
 
@@ -84,7 +83,7 @@ def get_video_url(video_url, token):
     return response.json()["VideoUrl"]
 
 def add_context_menu(context_li,course_name,course_title, database_path, replace = True):
-    context_li.addContextMenuItems([('Add to Favourite Courses',
+    context_li.addContextMenuItems([(xbmcaddon.getLocalizedString(30010),
                              'XBMC.RunScript(special://home/addons/plugin.video.pluralsight/resources/data/models/Favourites.py, %s, %s, %s)'
                              % (course_name, course_title.replace(",",""),database_path)),
                             ('Toggle watched', 'Action(ToggleWatched)')
@@ -111,13 +110,13 @@ def create_menu_item(name, mode):
 # region View Rendering
 def default_view():
     debug_log_duration("No mode, defaulting to main menu")
-    create_menu_item('Courses', MODE_COURSES)
-    create_menu_item('New Courses', MODE_NEW_COURSES)
-    create_menu_item('Categories', MODE_CATEGORY)
-    create_menu_item('Favourites', MODE_FAVOURITES)
-    create_menu_item('Authors', MODE_AUTHORS)
-    create_menu_item('Search', MODE_SEARCH_HISTORY)
-    create_menu_item('Learn Something New', MODE_RANDOM)
+    create_menu_item(xbmcaddon.getLocalizedString(30001), MODE_COURSES)
+    create_menu_item(xbmcaddon.getLocalizedString(30002), MODE_NEW_COURSES)
+    create_menu_item(xbmcaddon.getLocalizedString(30003), MODE_CATEGORY)
+    create_menu_item(xbmcaddon.getLocalizedString(30004), MODE_FAVOURITES)
+    create_menu_item(xbmcaddon.getLocalizedString(30005), MODE_AUTHORS)
+    create_menu_item(xbmcaddon.getLocalizedString(30006), MODE_SEARCH_HISTORY)
+    create_menu_item(xbmcaddon.getLocalizedString(30007), MODE_RANDOM)
     debug_log_duration("finished default mode")
 
 def author_view(catalogue):
@@ -171,7 +170,7 @@ def clip_view(catalogue):
 
 def search_history_view(catalogue):
     url = build_url({'mode': MODE_SEARCH, 'cached': 'true'})
-    li = xbmcgui.ListItem('New Search', iconImage='DefaultFolder.png')
+    li = xbmcgui.ListItem(xbmcaddon.getLocalizedString(30011), iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=url, listitem=li, isFolder=True)
     for search in catalogue.search_history:
         url = build_url({'mode': MODE_SEARCH, 'term': search['search_term'], 'cached': 'true'})
@@ -182,7 +181,7 @@ def search_view(catalogue):
     term = g_args.get('term', None)
     if term is None:
         dialog = xbmcgui.Dialog()
-        criteria = dialog.input("Search Criteria", type=xbmcgui.INPUT_ALPHANUM)
+        criteria = dialog.input(xbmcaddon.getLocalizedString(30020), type=xbmcgui.INPUT_ALPHANUM)
         debug_log_duration("pre-searching for: " + criteria)
         results = search_for(criteria)
         catalogue.save_search(criteria)
@@ -200,14 +199,14 @@ def favourites_view(catalogue):
         li = xbmcgui.ListItem(favourite["title"], iconImage='DefaultFolder.png')
         li.setInfo('video',
                    {'plot': course["description"], 'genre': course["category_id"], 'title': course["title"]})
-        li.addContextMenuItems([('Remove From Favourites',
+        li.addContextMenuItems([(xbmcaddon.getLocalizedString(30012),
                                  'XBMC.RunScript(special://home/addons/plugin.video.pluralsight/resources/data/models/Favourites.py, %s, %s)'
                                  % (course["name"], g_database_path))], replaceItems=True)
         xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=url, listitem=li, isFolder=True)
 
 def random_view(catalogue):
     url1 = build_url({'mode': MODE_RANDOM, 'cached': 'true'})
-    li1 = xbmcgui.ListItem('Pick a Different Course', iconImage='DefaultFolder.png')
+    li1 = xbmcgui.ListItem(xbmcaddon.getLocalizedString(30013), iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=url1, listitem=li1, isFolder=True)
     course = catalogue.get_random_course()
     courses_view([course, ])
