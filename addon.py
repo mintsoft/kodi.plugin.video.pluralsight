@@ -166,7 +166,8 @@ def clip_view(catalogue):
             {'mode': MODE_PLAY, 'clip_id': clip.index, 'module_name': module["name"], 'course_name': course["name"],
              'cached': 'true'})
         li = xbmcgui.ListItem(clip.title, iconImage='DefaultVideo.png')
-        li.addStreamInfo('video', {'width': 1024, 'height': 768, 'duration': clip.duration})
+        #'width': 1024, 'height': 768, 
+        li.addStreamInfo('video', {'duration': clip.duration})
         li.setProperty('IsPlayable', 'true')
         add_context_menu(li, course["name"], course["title"], g_database_path, False)
         xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=url, listitem=li)
@@ -248,15 +249,34 @@ def random_view(catalogue):
     courses_view([course, ])
 
 def play_view(catalogue):
+    # List of qualities to cycle through until a good one is found
+    qualities = {
+                 "1280x720mp4": { "width": 1280, "height": 720 },
+                 "1024x768mp4": { "width": 1024, "height": 768 },
+                 "848x640mp4":  { "width": 848, "height": 640 },
+                 "640x480mp4":  { "width": 640, "height": 480 }
+                 }
+                 
     module_name = g_args.get('module_name', None)[0]
     course_name = g_args.get('course_name', None)[0]
     clip_id = g_args.get('clip_id', None)[0]
     clip = catalogue.get_clip_by_id(clip_id, module_name, course_name)
-    url = clip.get_url(g_username)
+    found = False
+    
     try:
-        debug_log_duration("Getting video url for: " + url)
-        video_url = get_video_url(url, catalogue.token)
-        debug_log_duration("Got video url: " + video_url)
+        for k, v in qualities.iteritems():
+            url = clip.get_url(g_username, k)
+            debug_log_duration("Getting video url for: " + url)
+            video_url = get_video_url(url, catalogue.token)
+            debug_log_duration("Got video url: " + video_url)
+            
+            # Test that the url is good, otherwise move on
+            response = requests.get(video_url)
+            if response.status_code == 403:
+                continue
+            else
+                break
+                
     except AuthorisationError:
         debug_log_duration("Session has expired, re-authorising.")
         token, _ = login(catalogue)

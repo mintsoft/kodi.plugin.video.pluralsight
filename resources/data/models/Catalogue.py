@@ -36,17 +36,11 @@ class Clip:
         self.duration = duration
         self.title = title
 
-    def get_url(self, username):
-        qualities = {
-                     "1280x720mp4": { "width": 1280, "height": 720 },
-                     "1024x768mp4": { "width": 1024, "height": 768 },
-                     "848x640mp4":  { "width": 848, "height": 640 },
-                     "640x480mp4":  { "width": 640, "height": 480 }
-                     }
+    def get_url(self, username, quality="1024x768mp4"):
         return "http://www.pluralsight.com/metadata/live/users/{username}/" \
                "viewclip/{courseName}/{authorHandle}/{moduleName}/{clipIndex}" \
-               "/1024x768mp4".format(username=username, courseName=self.course_name, authorHandle=self.author_handle,
-                                     moduleName=self.module_name, clipIndex=self.index)
+               "/{quality}".format(username=username, courseName=self.course_name, authorHandle=self.author_handle,
+                                     moduleName=self.module_name, clipIndex=self.index, quality=quality)
 
 
 class Catalogue:
