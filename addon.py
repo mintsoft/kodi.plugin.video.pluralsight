@@ -254,7 +254,9 @@ def play_view(catalogue):
     clip = catalogue.get_clip_by_id(clip_id, module_name, course_name)
     url = clip.get_url(g_username)
     try:
+        debug_log_duration("Getting video url for: " + url)
         video_url = get_video_url(url, catalogue.token)
+        debug_log_duration("Got video url: " + video_url)
     except AuthorisationError:
         debug_log_duration("Session has expired, re-authorising.")
         token, _ = login(catalogue)
