@@ -195,6 +195,22 @@ def bookmarks_view(catalogue):
     courses = [catalogue.get_course_by_name(x['courseName']) for x in results]
     courses_view(courses)
     
+def recent_view(catalogue):
+    recent_url = "http://app.pluralsight.com/data/user/history"
+    headers = {
+        "Accept-Language": "en-us",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Accept-Encoding": "gzip"
+    }
+    debug_log_duration("Getting recently watched courses: " + recent_url)
+    token, cookies = login(catalogue)
+    response = requests.get(recent_url, headers=headers, cookies=cookies)
+    results = response.json()
+    debug_log_duration("Response: " + str(results))
+    courses = [catalogue.get_course_by_name(x['course']['name']) for x in results]
+    courses_view(courses)
+    
 def search_view(catalogue):
     term = g_args.get('term', None)
     if term is None:
