@@ -250,12 +250,12 @@ def random_view(catalogue):
 
 def play_view(catalogue):
     # List of qualities to cycle through until a good one is found
-    qualities = {
-                 "1280x720mp4": { "width": 1280, "height": 720 },
-                 "1024x768mp4": { "width": 1024, "height": 768 },
-                 "848x640mp4":  { "width": 848, "height": 640 },
-                 "640x480mp4":  { "width": 640, "height": 480 }
-                 }
+    qualities = [
+                 "1280x720mp4",
+                 "1024x768mp4",
+                 "848x640mp4", 
+                 "640x480mp4", 
+                 ]
                  
     module_name = g_args.get('module_name', None)[0]
     course_name = g_args.get('course_name', None)[0]
@@ -264,8 +264,8 @@ def play_view(catalogue):
     found = False
     
     try:
-        for k, v in qualities.iteritems():
-            url = clip.get_url(g_username, k)
+        for quality in qualities:
+            url = clip.get_url(g_username, quality)
             debug_log_duration("Getting video url for: " + url)
             video_url = get_video_url(url, catalogue.token)
             debug_log_duration("Got video url: " + video_url)
