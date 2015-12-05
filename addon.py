@@ -274,7 +274,7 @@ def play_view(catalogue):
             response = requests.get(video_url)
             if response.status_code == 403:
                 continue
-            else
+            else:
                 break
                 
     except AuthorisationError:
