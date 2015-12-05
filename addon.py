@@ -166,7 +166,6 @@ def clip_view(catalogue):
             {'mode': MODE_PLAY, 'clip_id': clip.index, 'module_name': module["name"], 'course_name': course["name"],
              'cached': 'true'})
         li = xbmcgui.ListItem(clip.title, iconImage='DefaultVideo.png')
-        #'width': 1024, 'height': 768, 
         li.addStreamInfo('video', {'duration': clip.duration})
         li.setProperty('IsPlayable', 'true')
         add_context_menu(li, course["name"], course["title"], g_database_path, False)
