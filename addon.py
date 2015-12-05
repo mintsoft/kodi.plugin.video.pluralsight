@@ -31,6 +31,8 @@ MODE_RECENT = 'recent'
 # region Exceptions
 class AuthorisationError(Exception):
     """ Raise this exception when you cannot access a resource due to authentication issues """
+class VideoNotFoundError(Exception):
+    """ Raise this exception when you cannot access a resource due to existence issues """
 # endregion
 # region Global Functions
 
@@ -73,6 +75,7 @@ def login(login_catalog):
     response = requests.post(login_url, data=payload, headers=login_headers)
     debug_log_duration("Completed login, Response Code:" + str(response.status_code))
     login_token = response.json()["Token"]
+    debug_log_duration("Got token: " + login_token)
     login_catalog.update_token(login_token)
     return login_token, response.cookies
 
@@ -82,6 +85,9 @@ def get_video_url(video_url, token):
     response = requests.post(video_url, data=payload, headers=video_headers)
     if response.status_code == 403:
         raise AuthorisationError
+    if response.status_code == 404:
+        raise VideoNotFoundError
+    debug_log_duration("Got video url content: " + str(vars(response)))
     return response.json()["VideoUrl"]
 
 def add_context_menu(context_li,course_name,course_title, database_path, replace = True):
@@ -264,24 +270,28 @@ def play_view(catalogue):
     clip = catalogue.get_clip_by_id(clip_id, module_name, course_name)
     found = False
     
-    try:
-        for quality in qualities:
-            url = clip.get_url(g_username, quality)
-            debug_log_duration("Getting video url for: " + url)
+    for quality in qualities:
+        url = clip.get_url(g_username, quality)
+        debug_log_duration("Getting video url for: " + url)
+        try:
             video_url = get_video_url(url, catalogue.token)
-            debug_log_duration("Got video url: " + video_url)
-            
-            # Test that the url is good, otherwise move on
-            response = requests.get(video_url)
-            if response.status_code == 403:
-                continue
-            else:
-                break
+        except AuthorisationError:
+            debug_log_duration("Session has expired, re-authorising.")
+            token, _ = login(catalogue)
+            video_url = get_video_url(url, token)
+        except VideoNotFoundError:
+            debug_log_duration("Quality doesn't exist, moving on...")
+            continue
+        debug_log_duration("Got video url: " + video_url)
+        # Test that the url is good, otherwise move on
+        response = requests.get(video_url)
+        if response.status_code in (403, 404):
+            debug_log_duration("URL is bad, moving on...")
+            continue
+        else:
+            debug_log_duration("URL is good, continuing...")
+            break
                 
-    except AuthorisationError:
-        debug_log_duration("Session has expired, re-authorising.")
-        token, _ = login(catalogue)
-        video_url = get_video_url(url, token)
     li = xbmcgui.ListItem(path=video_url)
     xbmcplugin.setResolvedUrl(handle=g_addon_handle, succeeded=True, listitem=li)
 
