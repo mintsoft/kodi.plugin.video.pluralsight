@@ -26,6 +26,7 @@ MODE_PLAY = 'play'
 MODE_AUTHORS = 'authors'
 MODE_COURSE_BY_AUTHOR = 'courses_by_author'
 MODE_BOOKMARKS = 'bookmarks'
+MODE_RECENT = 'recent'
 # endregion
 # region Exceptions
 class AuthorisationError(Exception):
@@ -321,8 +322,6 @@ def main():
 
     if mode is None:
         default_view()
-    elif mode[0] == MODE_BOOKMARKS:
-        bookmarks_view(catalogue)
     elif mode[0] == MODE_COURSES:
         courses_view(catalogue.courses)
     elif mode[0] == MODE_NEW_COURSES:
@@ -350,6 +349,10 @@ def main():
         random_view(catalogue)
     elif mode[0] == MODE_PLAY:
         play_view(catalogue)
+    elif mode[0] == MODE_BOOKMARKS:
+        bookmarks_view(catalogue)
+    elif mode[0] == MODE_RECENT:
+        recent_view(catalogue)
 
     debug_log_duration("closing catalogue")
     catalogue.close_db()
