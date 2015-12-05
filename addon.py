@@ -249,7 +249,9 @@ def random_view(catalogue):
     courses_view([course, ])
 
 def play_view(catalogue):
-    # List of qualities to cycle through until a good one is found
+    # List of qualities to cycle through until a good one is found.
+    # This seem to be all the ones PluralSight supports
+    # Added because some videos seemed to lack some quality options
     qualities = [
                  "1280x720mp4",
                  "1024x768mp4",
