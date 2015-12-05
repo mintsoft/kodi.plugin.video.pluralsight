@@ -116,6 +116,7 @@ def default_view():
     create_menu_item(g_addon.getLocalizedString(30003), MODE_CATEGORY)
     create_menu_item(g_addon.getLocalizedString(30008), MODE_BOOKMARKS)
     create_menu_item(g_addon.getLocalizedString(30004), MODE_FAVOURITES)
+    create_menu_item(g_addon.getLocalizedString(30009), MODE_RECENT)
     create_menu_item(g_addon.getLocalizedString(30005), MODE_AUTHORS)
     create_menu_item(g_addon.getLocalizedString(30006), MODE_SEARCH_HISTORY)
     create_menu_item(g_addon.getLocalizedString(30007), MODE_RANDOM)
