@@ -189,13 +189,12 @@ def bookmarks_view(catalogue):
     }
     debug_log_duration("Getting bookmarked courses: " + bookmark_url)
     token, cookies = login(catalogue)
-    debug_log_duration("Token: " + str(token))
     response = requests.get(bookmark_url, headers=headers, cookies=cookies)
     results = response.json()
     debug_log_duration("Response: " + str(results))
     courses = [catalogue.get_course_by_name(x['courseName']) for x in results]
-    courses_view(courses)    
-
+    courses_view(courses)
+    
 def search_view(catalogue):
     term = g_args.get('term', None)
     if term is None:
