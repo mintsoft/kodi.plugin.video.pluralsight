@@ -25,6 +25,7 @@ MODE_RANDOM = 'random'
 MODE_PLAY = 'play'
 MODE_AUTHORS = 'authors'
 MODE_COURSE_BY_AUTHOR = 'courses_by_author'
+MODE_BOOKMARKS = 'bookmarks'
 # endregion
 # region Exceptions
 class AuthorisationError(Exception):
@@ -72,7 +73,7 @@ def login(login_catalog):
     debug_log_duration("Completed login, Response Code:" + str(response.status_code))
     login_token = response.json()["Token"]
     login_catalog.update_token(login_token)
-    return login_token
+    return login_token, response.cookies
 
 def get_video_url(video_url, token):
     video_headers = {"Content-Type": "application/x-www-form-urlencoded"}
@@ -113,6 +114,7 @@ def default_view():
     create_menu_item(g_addon.getLocalizedString(30001), MODE_COURSES)
     create_menu_item(g_addon.getLocalizedString(30002), MODE_NEW_COURSES)
     create_menu_item(g_addon.getLocalizedString(30003), MODE_CATEGORY)
+    create_menu_item(g_addon.getLocalizedString(30008), MODE_BOOKMARKS)
     create_menu_item(g_addon.getLocalizedString(30004), MODE_FAVOURITES)
     create_menu_item(g_addon.getLocalizedString(30005), MODE_AUTHORS)
     create_menu_item(g_addon.getLocalizedString(30006), MODE_SEARCH_HISTORY)
@@ -177,6 +179,23 @@ def search_history_view(catalogue):
         li = xbmcgui.ListItem(search['search_term'], iconImage='DefaultFolder.png')
         xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=url, listitem=li, isFolder=True)
 
+def bookmarks_view(catalogue):
+    bookmark_url = "http://app.pluralsight.com/data/bookmarks"
+    headers = {
+        "Accept-Language": "en-us",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Accept-Encoding": "gzip"
+    }
+    debug_log_duration("Getting bookmarked courses: " + bookmark_url)
+    token, cookies = login(catalogue)
+    debug_log_duration("Token: " + str(token))
+    response = requests.get(bookmark_url, headers=headers, cookies=cookies)
+    results = response.json()
+    debug_log_duration("Response: " + str(results))
+    courses = [catalogue.get_course_by_name(x['courseName']) for x in results]
+    courses_view(courses)    
+
 def search_view(catalogue):
     term = g_args.get('term', None)
     if term is None:
@@ -221,7 +240,7 @@ def play_view(catalogue):
         video_url = get_video_url(url, catalogue.token)
     except AuthorisationError:
         debug_log_duration("Session has expired, re-authorising.")
-        token = login(catalogue)
+        token, _ = login(catalogue)
         video_url = get_video_url(url, token)
     li = xbmcgui.ListItem(path=video_url)
     xbmcplugin.setResolvedUrl(handle=g_addon_handle, succeeded=True, listitem=li)
@@ -286,6 +305,8 @@ def main():
 
     if mode is None:
         default_view()
+    elif mode[0] == MODE_BOOKMARKS:
+        bookmarks_view(catalogue)
     elif mode[0] == MODE_COURSES:
         courses_view(catalogue.courses)
     elif mode[0] == MODE_NEW_COURSES:
