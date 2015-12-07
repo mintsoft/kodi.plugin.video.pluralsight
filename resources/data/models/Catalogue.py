@@ -1,4 +1,5 @@
 import sqlite3
+import cPickle
 import os
 from random import randint
 import string
@@ -52,6 +53,10 @@ class Catalogue:
                 CREATE TABLE cache_status (
                     etag TEXT
                 ) ''')
+            database.execute('''
+                CREATE TABLE cookies (
+                    cookieblob TEXT
+            )''')
             database.execute('''
                 CREATE TABLE auth (
                     token TEXT
@@ -174,6 +179,11 @@ class Catalogue:
         self.database.execute('DELETE FROM auth')
         self.database.execute('INSERT INTO auth(token) VALUES(?)', (token,))
         self.database.commit()
+        
+    def update_cookies(self,cookies):
+        self.database.execute('DELETE FROM cookies')
+        self.database.execute('INSERT INTO cookies(cookieblob) VALUES(?)', (cPickle.dumps(cookies), ))
+        self.database.commit()
 
     @property
     def etag(self):
@@ -208,6 +218,10 @@ class Catalogue:
     @property
     def favourites(self):
         return self.database.cursor().execute('SELECT * FROM favourite').fetchall()
+        
+    @property
+    def cookies(self):
+        return cPickle.loads( str( self.database.cursor().execute('SELECT * FROM cookies').fetchall()[0]["cookieblob"] ) )
 
     @property
     def search_history(self):

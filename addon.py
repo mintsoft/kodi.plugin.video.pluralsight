@@ -77,7 +77,8 @@ def login(login_catalog):
     login_token = response.json()["Token"]
     debug_log_duration("Got token: " + login_token)
     login_catalog.update_token(login_token)
-    return login_token, response.cookies
+    login_catalog.update_cookies(response.cookies)
+    return login_token
 
 def get_video_url(video_url, token):
     video_headers = {"Content-Type": "application/x-www-form-urlencoded"}
@@ -188,7 +189,7 @@ def search_history_view(catalogue):
         xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=url, listitem=li, isFolder=True)
 
 def bookmarks_view(catalogue):
-    bookmark_url = "http://app.pluralsight.com/data/bookmarks"
+    bookmark_url = "https://app.pluralsight.com/data/bookmarks"
     headers = {
         "Accept-Language": "en-us",
         "Content-Type": "application/json",
@@ -196,15 +197,15 @@ def bookmarks_view(catalogue):
         "Accept-Encoding": "gzip"
     }
     debug_log_duration("Getting bookmarked courses: " + bookmark_url)
-    token, cookies = login(catalogue)
-    response = requests.get(bookmark_url, headers=headers, cookies=cookies)
+    token = login(catalogue)
+    response = requests.get(bookmark_url, headers=headers, cookies=catalogue.cookies)
     results = response.json()
     debug_log_duration("Response: " + str(results))
     courses = [catalogue.get_course_by_name(x['courseName']) for x in results]
     courses_view(courses)
     
 def recent_view(catalogue):
-    recent_url = "http://app.pluralsight.com/data/user/history"
+    recent_url = "https://app.pluralsight.com/data/user/history"
     headers = {
         "Accept-Language": "en-us",
         "Content-Type": "application/json",
@@ -212,11 +213,11 @@ def recent_view(catalogue):
         "Accept-Encoding": "gzip"
     }
     debug_log_duration("Getting recently watched courses: " + recent_url)
-    token, cookies = login(catalogue)
-    response = requests.get(recent_url, headers=headers, cookies=cookies)
+    token = login(catalogue)
+    response = requests.get(recent_url, headers=headers, cookies=catalogue.cookies)
     results = response.json()
     debug_log_duration("Response: " + str(results))
-    courses = [catalogue.get_course_by_name(x['course']['name']) for x in results]
+    courses = [catalogue.get_course_by_name(x['course']['name']) for x in results][:10]
     courses_view(courses)
     
 def search_view(catalogue):
@@ -277,7 +278,7 @@ def play_view(catalogue):
             video_url = get_video_url(url, catalogue.token)
         except AuthorisationError:
             debug_log_duration("Session has expired, re-authorising.")
-            token, _ = login(catalogue)
+            token = login(catalogue)
             video_url = get_video_url(url, token)
         except VideoNotFoundError:
             debug_log_duration("Quality doesn't exist, moving on...")
