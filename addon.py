@@ -25,10 +25,14 @@ MODE_RANDOM = 'random'
 MODE_PLAY = 'play'
 MODE_AUTHORS = 'authors'
 MODE_COURSE_BY_AUTHOR = 'courses_by_author'
+MODE_BOOKMARKS = 'bookmarks'
+MODE_RECENT = 'recent'
 # endregion
 # region Exceptions
 class AuthorisationError(Exception):
     """ Raise this exception when you cannot access a resource due to authentication issues """
+class VideoNotFoundError(Exception):
+    """ Raise this exception when you cannot access a resource due to existence issues """
 # endregion
 # region Global Functions
 
@@ -71,7 +75,9 @@ def login(login_catalog):
     response = requests.post(login_url, data=payload, headers=login_headers)
     debug_log_duration("Completed login, Response Code:" + str(response.status_code))
     login_token = response.json()["Token"]
+    debug_log_duration("Got token: " + login_token)
     login_catalog.update_token(login_token)
+    login_catalog.update_cookies(response.cookies)
     return login_token
 
 def get_video_url(video_url, token):
@@ -80,6 +86,9 @@ def get_video_url(video_url, token):
     response = requests.post(video_url, data=payload, headers=video_headers)
     if response.status_code == 403:
         raise AuthorisationError
+    if response.status_code == 404:
+        raise VideoNotFoundError
+    debug_log_duration("Got video url content: " + str(vars(response)))
     return response.json()["VideoUrl"]
 
 def add_context_menu(context_li,course_name,course_title, database_path, replace = True):
@@ -113,7 +122,9 @@ def default_view():
     create_menu_item(g_addon.getLocalizedString(30001), MODE_COURSES)
     create_menu_item(g_addon.getLocalizedString(30002), MODE_NEW_COURSES)
     create_menu_item(g_addon.getLocalizedString(30003), MODE_CATEGORY)
+    create_menu_item(g_addon.getLocalizedString(30008), MODE_BOOKMARKS)
     create_menu_item(g_addon.getLocalizedString(30004), MODE_FAVOURITES)
+    create_menu_item(g_addon.getLocalizedString(30009), MODE_RECENT)
     create_menu_item(g_addon.getLocalizedString(30005), MODE_AUTHORS)
     create_menu_item(g_addon.getLocalizedString(30006), MODE_SEARCH_HISTORY)
     create_menu_item(g_addon.getLocalizedString(30007), MODE_RANDOM)
@@ -162,7 +173,7 @@ def clip_view(catalogue):
             {'mode': MODE_PLAY, 'clip_id': clip.index, 'module_name': module["name"], 'course_name': course["name"],
              'cached': 'true'})
         li = xbmcgui.ListItem(clip.title, iconImage='DefaultVideo.png')
-        li.addStreamInfo('video', {'width': 1024, 'height': 768, 'duration': clip.duration})
+        li.addStreamInfo('video', {'duration': clip.duration})
         li.setProperty('IsPlayable', 'true')
         add_context_menu(li, course["name"], course["title"], g_database_path, False)
         xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=url, listitem=li)
@@ -177,6 +188,38 @@ def search_history_view(catalogue):
         li = xbmcgui.ListItem(search['search_term'], iconImage='DefaultFolder.png')
         xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=url, listitem=li, isFolder=True)
 
+def bookmarks_view(catalogue):
+    bookmark_url = "https://app.pluralsight.com/data/bookmarks"
+    headers = {
+        "Accept-Language": "en-us",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Accept-Encoding": "gzip"
+    }
+    debug_log_duration("Getting bookmarked courses: " + bookmark_url)
+    token = login(catalogue)
+    response = requests.get(bookmark_url, headers=headers, cookies=catalogue.cookies)
+    results = response.json()
+    debug_log_duration("Response: " + str(results))
+    courses = [catalogue.get_course_by_name(x['courseName']) for x in results]
+    courses_view(courses)
+    
+def recent_view(catalogue):
+    recent_url = "https://app.pluralsight.com/data/user/history"
+    headers = {
+        "Accept-Language": "en-us",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Accept-Encoding": "gzip"
+    }
+    debug_log_duration("Getting recently watched courses: " + recent_url)
+    token = login(catalogue)
+    response = requests.get(recent_url, headers=headers, cookies=catalogue.cookies)
+    results = response.json()
+    debug_log_duration("Response: " + str(results))
+    courses = [catalogue.get_course_by_name(x['course']['name']) for x in results][:10]
+    courses_view(courses)
+    
 def search_view(catalogue):
     term = g_args.get('term', None)
     if term is None:
@@ -212,17 +255,44 @@ def random_view(catalogue):
     courses_view([course, ])
 
 def play_view(catalogue):
+    # List of qualities to cycle through until a good one is found.
+    # This seem to be all the ones PluralSight supports
+    # Added because some videos seemed to lack some quality options
+    qualities = [
+                 "1280x720mp4",
+                 "1024x768mp4",
+                 "848x640mp4", 
+                 "640x480mp4", 
+                 ]
+                 
     module_name = g_args.get('module_name', None)[0]
     course_name = g_args.get('course_name', None)[0]
     clip_id = g_args.get('clip_id', None)[0]
     clip = catalogue.get_clip_by_id(clip_id, module_name, course_name)
-    url = clip.get_url(g_username)
-    try:
-        video_url = get_video_url(url, catalogue.token)
-    except AuthorisationError:
-        debug_log_duration("Session has expired, re-authorising.")
-        token = login(catalogue)
-        video_url = get_video_url(url, token)
+    found = False
+    
+    for quality in qualities:
+        url = clip.get_url(g_username, quality)
+        debug_log_duration("Getting video url for: " + url)
+        try:
+            video_url = get_video_url(url, catalogue.token)
+        except AuthorisationError:
+            debug_log_duration("Session has expired, re-authorising.")
+            token = login(catalogue)
+            video_url = get_video_url(url, token)
+        except VideoNotFoundError:
+            debug_log_duration("Quality doesn't exist, moving on...")
+            continue
+        debug_log_duration("Got video url: " + video_url)
+        # Test that the url is good, otherwise move on
+        response = requests.get(video_url)
+        if response.status_code in (403, 404):
+            debug_log_duration("URL is bad, moving on...")
+            continue
+        else:
+            debug_log_duration("URL is good, continuing...")
+            break
+                
     li = xbmcgui.ListItem(path=video_url)
     xbmcplugin.setResolvedUrl(handle=g_addon_handle, succeeded=True, listitem=li)
 
@@ -313,6 +383,10 @@ def main():
         random_view(catalogue)
     elif mode[0] == MODE_PLAY:
         play_view(catalogue)
+    elif mode[0] == MODE_BOOKMARKS:
+        bookmarks_view(catalogue)
+    elif mode[0] == MODE_RECENT:
+        recent_view(catalogue)
 
     debug_log_duration("closing catalogue")
     catalogue.close_db()
