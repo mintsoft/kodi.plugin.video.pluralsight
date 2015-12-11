@@ -54,10 +54,6 @@ class Catalogue:
                     etag TEXT
                 ) ''')
             database.execute('''
-                CREATE TABLE cookies (
-                    cookieblob TEXT
-            )''')
-            database.execute('''
                 CREATE TABLE auth (
                     token TEXT
                 ) ''')
@@ -127,6 +123,12 @@ class Catalogue:
             database.commit()
         else:
             database = sqlite3.connect(database_path)
+            # Deviations from the original schema should be
+            # defined here so that upgrades will work correctly
+            database.execute('''
+                CREATE TABLE IF NOT EXISTS cookies (
+                    cookieblob TEXT
+            )''')
 
         database.row_factory = sqlite3.Row
         self.database = database
