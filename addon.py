@@ -78,6 +78,8 @@ def login(login_catalog):
     debug_log_duration("Using url: " + login_url)
     response = requests.post(login_url, data=payload, headers=login_headers)
     debug_log_duration("Completed login, Response Code:" + str(response.status_code))
+    if response.status_code != 200:
+        raise AuthorisationError
     login_token = response.json()["Token"]
     debug_log_duration("Got token: " + login_token)
     login_catalog.update_token(login_token)
@@ -202,7 +204,7 @@ def bookmarks_view(catalogue):
             "Accept-Encoding": "gzip"
         }
         debug_log_duration("Getting bookmarked courses: " + bookmark_url)
-        token = login(catalogue)
+        login(catalogue)
         response = requests.get(bookmark_url, headers=headers, cookies=catalogue.cookies)
         if response.status_code == 403:
             raise AuthorisationError
@@ -212,22 +214,29 @@ def bookmarks_view(catalogue):
         courses_view(courses)
     except AuthorisationError:
         display_auth_error()
+        #this results in many nested default_views
+        #default_view()
     
 def recent_view(catalogue):
-    recent_url = "https://app.pluralsight.com/data/user/history"
-    headers = {
-        "Accept-Language": "en-us",
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "Accept-Encoding": "gzip"
-    }
-    debug_log_duration("Getting recently watched courses: " + recent_url)
-    token = login(catalogue)
-    response = requests.get(recent_url, headers=headers, cookies=catalogue.cookies)
-    results = response.json()
-    debug_log_duration("Response: " + str(results))
-    courses = [catalogue.get_course_by_name(x['course']['name']) for x in results][:10]
-    courses_view(courses)
+    try:
+        recent_url = "https://app.pluralsight.com/data/user/history"
+        headers = {
+            "Accept-Language": "en-us",
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Accept-Encoding": "gzip"
+        }
+        debug_log_duration("Getting recently watched courses: " + recent_url)
+        login(catalogue)
+        response = requests.get(recent_url, headers=headers, cookies=catalogue.cookies)
+        results = response.json()
+        debug_log_duration("Response: " + str(results))
+        courses = [catalogue.get_course_by_name(x['course']['name']) for x in results][:10]
+        courses_view(courses)
+    except AuthorisationError:
+        display_auth_error()
+        #this results in many nested default_views
+        #default_view()
     
 def search_view(catalogue):
     term = g_args.get('term', None)
@@ -300,7 +309,7 @@ def play_view(catalogue):
         li = xbmcgui.ListItem(path=video_url)
         xbmcplugin.setResolvedUrl(handle=g_addon_handle, succeeded=True, listitem=li)
     except AuthorisationError:
-        display_auth_error();
+        display_auth_error()
 
 def courses_view(courses):
     global g_database_path
