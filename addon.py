@@ -66,6 +66,10 @@ def credentials_are_valid():
         return False
     return True
 
+def display_auth_error():
+    popup_dialog = xbmcgui.Dialog()
+    popup_dialog.notification(g_addon.getLocalizedString(30023), g_addon.getLocalizedString(30025), xbmcgui.NOTIFICATION_ERROR)
+
 def login(login_catalog):
     debug_log_duration("Starting login")
     login_headers = {"Content-Type": "application/x-www-form-urlencoded"}
@@ -189,20 +193,25 @@ def search_history_view(catalogue):
         xbmcplugin.addDirectoryItem(handle=g_addon_handle, url=url, listitem=li, isFolder=True)
 
 def bookmarks_view(catalogue):
-    bookmark_url = "https://app.pluralsight.com/data/bookmarks"
-    headers = {
-        "Accept-Language": "en-us",
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "Accept-Encoding": "gzip"
-    }
-    debug_log_duration("Getting bookmarked courses: " + bookmark_url)
-    token = login(catalogue)
-    response = requests.get(bookmark_url, headers=headers, cookies=catalogue.cookies)
-    results = response.json()
-    debug_log_duration("Response: " + str(results))
-    courses = [catalogue.get_course_by_name(x['courseName']) for x in results]
-    courses_view(courses)
+    try :
+        bookmark_url = "https://app.pluralsight.com/data/bookmarks"
+        headers = {
+            "Accept-Language": "en-us",
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Accept-Encoding": "gzip"
+        }
+        debug_log_duration("Getting bookmarked courses: " + bookmark_url)
+        token = login(catalogue)
+        response = requests.get(bookmark_url, headers=headers, cookies=catalogue.cookies)
+        if response.status_code == 403:
+            raise AuthorisationError
+        results = response.json()
+        debug_log_duration("Response: " + str(results))
+        courses = [catalogue.get_course_by_name(x['courseName']) for x in results]
+        courses_view(courses)
+    except AuthorisationError:
+        display_auth_error()
     
 def recent_view(catalogue):
     recent_url = "https://app.pluralsight.com/data/user/history"
@@ -255,46 +264,43 @@ def random_view(catalogue):
     courses_view([course, ])
 
 def play_view(catalogue):
-    # List of qualities to cycle through until a good one is found.
-    # This seem to be all the ones PluralSight supports
-    # Added because some videos seemed to lack some quality options
     qualities = [
                  "1280x720mp4",
                  "1024x768mp4",
                  "848x640mp4", 
                  "640x480mp4", 
                  ]
-                 
-    module_name = g_args.get('module_name', None)[0]
-    course_name = g_args.get('course_name', None)[0]
-    clip_id = g_args.get('clip_id', None)[0]
-    clip = catalogue.get_clip_by_id(clip_id, module_name, course_name)
-    found = False
-    
-    for quality in qualities:
-        url = clip.get_url(g_username, quality)
-        debug_log_duration("Getting video url for: " + url)
-        try:
-            video_url = get_video_url(url, catalogue.token)
-        except AuthorisationError:
-            debug_log_duration("Session has expired, re-authorising.")
-            token = login(catalogue)
-            video_url = get_video_url(url, token)
-        except VideoNotFoundError:
-            debug_log_duration("Quality doesn't exist, moving on...")
-            continue
-        debug_log_duration("Got video url: " + video_url)
-        # Test that the url is good, otherwise move on
-        response = requests.get(video_url)
-        if response.status_code in (403, 404):
-            debug_log_duration("URL is bad, moving on...")
-            continue
-        else:
-            debug_log_duration("URL is good, continuing...")
-            break
-                
-    li = xbmcgui.ListItem(path=video_url)
-    xbmcplugin.setResolvedUrl(handle=g_addon_handle, succeeded=True, listitem=li)
+    try:
+        module_name = g_args.get('module_name', None)[0]
+        course_name = g_args.get('course_name', None)[0]
+        clip_id = g_args.get('clip_id', None)[0]
+        clip = catalogue.get_clip_by_id(clip_id, module_name, course_name)
+        for quality in qualities:
+            url = clip.get_url(g_username, quality)
+            debug_log_duration("Getting video url for: " + url)
+            try:
+                video_url = get_video_url(url, catalogue.token)
+            except AuthorisationError:
+                debug_log_duration("Session has expired, re-authorising.")
+                token = login(catalogue)
+                video_url = get_video_url(url, token)
+            except VideoNotFoundError:
+                debug_log_duration("Quality doesn't exist, moving on...")
+                continue
+            debug_log_duration("Got video url: " + video_url)
+
+            response = requests.head(video_url)
+            if response.status_code in (403, 404):
+                debug_log_duration("URL is bad, moving on...")
+                continue
+            else:
+                debug_log_duration("URL is good, continuing...")
+                break
+
+        li = xbmcgui.ListItem(path=video_url)
+        xbmcplugin.setResolvedUrl(handle=g_addon_handle, succeeded=True, listitem=li)
+    except AuthorisationError:
+        display_auth_error();
 
 def courses_view(courses):
     global g_database_path
