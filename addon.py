@@ -272,17 +272,9 @@ def random_view(catalogue):
     course = catalogue.get_random_course()
     courses_view([course, ])
 
-def pretty_print_POST(req):
-    debug_log_duration('{}\n{}\n{}\n\n{}'.format(
-        '-----------START-----------',
-        req.method + ' ' + req.url,
-        '\n'.join('{}: {}'.format(k, v) for k, v in req.headers.items()),
-        req.body,
-    ))
-
 def play_view(catalogue):
     qualities = [
-                 #"1280x720",
+                 "1280x720",
                  "1024x768",
                  "848x640", 
                  "640x480", 
@@ -294,15 +286,13 @@ def play_view(catalogue):
         clip = catalogue.get_clip_by_id(clip_id, module_name, course_name)
         for quality in qualities:
             req = requests.Request('POST', 'https://app.pluralsight.com/video/clips/viewclip', headers={'Accept':'*/*', 'Accept-Encoding':'gzip, deflate, br', 'Accept-Language': 'en-US,en;q=0.8,en-GB;q=0.6', 'Content-Type': 'application/json;charset=UTF-8'}, json={"author":clip.author_handle, "includeCaptions":False, "clipIndex":int(clip_id), "courseName":course_name, "locale":"en", "moduleName":module_name, "mediaType":"mp4", "quality":quality}, cookies=catalogue.cookies)
-            #req = requests.Request('POST', 'https://app.pluralsight.com/video/clips/viewclip', headers={'Accept':'application/json'}, json={"author":clip.author_handle, "includeCaptions":False, "clipIndex":str(clip_id), "courseName":course_name, "locale":"en", "moduleName":module_name, "mediaType":"mp4", "quality":quality}, cookies=catalogue.cookies)
             prepared = req.prepare()
-            pretty_print_POST(prepared)
             session = requests.Session()
             response = session.send(prepared) 
-            #response = requests.post('https://app.pluralsight.com/video/clips/viewclip', json={"author":clip.author_handle, "includeCaptions":False, "clipIndex":clip_id, "courseName":course_name, "locale":"en", "moduleName":module_name, "mediaType":"mp4", "quality":quality}, cookies=catalogue.cookies)
             debug_log_duration("viewclip, Response Code:" + str(response.status_code))
             if len(response.json()["urls"]) > 0:
                 video_url = response.json()["urls"][0]["url"]
+                break
             else:
                 next
         #video_url=get_video_url
