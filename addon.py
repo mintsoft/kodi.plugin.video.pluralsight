@@ -285,17 +285,11 @@ def play_view(catalogue):
         clip_id = g_args.get('clip_id', None)[0]
         clip = catalogue.get_clip_by_id(clip_id, module_name, course_name)
         for quality in qualities:
-            req = requests.Request('POST', 'https://app.pluralsight.com/video/clips/viewclip', headers={'Accept':'*/*', 'Accept-Encoding':'gzip, deflate, br', 'Accept-Language': 'en-US,en;q=0.8,en-GB;q=0.6', 'Content-Type': 'application/json;charset=UTF-8'}, json={"author":clip.author_handle, "includeCaptions":False, "clipIndex":int(clip_id), "courseName":course_name, "locale":"en", "moduleName":module_name, "mediaType":"mp4", "quality":quality}, cookies=catalogue.cookies)
-            prepared = req.prepare()
-            session = requests.Session()
-            response = session.send(prepared) 
+            response = requests.post('https://app.pluralsight.com/video/clips/viewclip', headers={'Accept':'*/*', 'Accept-Encoding':'gzip, deflate, br', 'Accept-Language': 'en-US,en;q=0.8,en-GB;q=0.6', 'Content-Type': 'application/json;charset=UTF-8'}, json={"author":clip.author_handle, "includeCaptions":False, "clipIndex":int(clip_id), "courseName":course_name, "locale":"en", "moduleName":module_name, "mediaType":"mp4", "quality":quality}, cookies=catalogue.cookies)
             debug_log_duration("viewclip, Response Code:" + str(response.status_code))
             if len(response.json()["urls"]) > 0:
                 video_url = response.json()["urls"][0]["url"]
                 break
-            else:
-                next
-        #video_url=get_video_url
         debug_log_duration("VideoURL chosen:" + video_url)
         li = xbmcgui.ListItem(path=video_url)
         xbmcplugin.setResolvedUrl(handle=g_addon_handle, succeeded=True, listitem=li)
@@ -400,3 +394,4 @@ def main():
 
 g_start_time = time.time()
 main()
+
