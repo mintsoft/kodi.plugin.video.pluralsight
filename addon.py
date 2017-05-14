@@ -6,7 +6,7 @@ import urlparse
 
 import xbmc
 import xbmcaddon
-import xbmcplugin
+import xbmcplugin_
 import xbmcgui
 from resources.lib import requests
 from resources.data.models import Catalogue
@@ -346,6 +346,9 @@ def main():
             debug_log_duration("Loading from cache as it has not modified (fast-path)")
         else:
             debug_log_duration("Re-priming DB from the API response (slow-path)")
+            data_etag = ""
+            if ETag in r.headers:
+                data_etag = r.headers["ETag']
             catalogue.update(r.headers["ETag"], r.json())
 
     else:
