@@ -343,7 +343,7 @@ def main():
         else:
             debug_log_duration("Re-priming DB from the API response (slow-path)")
             data_etag = ""
-            if ETag in r.headers:
+            if "ETag" in r.headers:
                 data_etag = r.headers["ETag"]
             catalogue.update(data_etag, r.json())
 
