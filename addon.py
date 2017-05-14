@@ -6,7 +6,7 @@ import urlparse
 
 import xbmc
 import xbmcaddon
-import xbmcplugin_
+import xbmcplugin
 import xbmcgui
 from resources.lib import requests
 from resources.data.models import Catalogue
@@ -214,8 +214,6 @@ def bookmarks_view(catalogue):
         courses_view(courses)
     except AuthorisationError:
         display_auth_error()
-        #this results in many nested default_views
-        #default_view()
     
 def recent_view(catalogue):
     try:
@@ -235,8 +233,6 @@ def recent_view(catalogue):
         courses_view(courses)
     except AuthorisationError:
         display_auth_error()
-        #this results in many nested default_views
-        #default_view()
     
 def search_view(catalogue):
     term = g_args.get('term', None)
@@ -348,8 +344,8 @@ def main():
             debug_log_duration("Re-priming DB from the API response (slow-path)")
             data_etag = ""
             if ETag in r.headers:
-                data_etag = r.headers["ETag']
-            catalogue.update(r.headers["ETag"], r.json())
+                data_etag = r.headers["ETag"]
+            catalogue.update(data_etag, r.json())
 
     else:
         catalogue = Catalogue.Catalogue(g_database_path)
